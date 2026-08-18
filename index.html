@@ -289,24 +289,56 @@
 
   /* ===================== Responsive ===================== */
   @media (max-width:860px){
+    /* tabs */
+    .tabs{margin-top:-26px}
+    .tabs button{padding:12px 14px;gap:10px}
+    .tabs .t-ic{width:40px;height:40px;font-size:20px}
+    .tabs .t-main b{font-size:15px}
+
+    /* stats */
     .stats{grid-template-columns:repeat(2,1fr);gap:12px}
     .stat{padding:14px 16px}
     .stat .num{font-size:26px}
+
+    /* toolbar — filters never overflow the viewport */
+    .toolbar{gap:8px}
+    .search{flex:1 1 100%}
+    .fl-label{display:none}
+    .seg{flex:1 1 100%;flex-wrap:wrap}
+    .seg button{flex:1 1 auto;justify-content:center;padding:7px 10px;font-size:13px}
+    .tool-btn{flex:1 1 100%;justify-content:center}
+    .result-count{margin-inline-start:0;width:100%;text-align:center;order:9;padding-top:2px}
+
+    /* layout: sidebar becomes a horizontal category strip above the content */
     .layout{flex-direction:column}
-    aside.nav{position:static;width:100%;flex-basis:auto;max-height:none;order:-1}
+    aside.nav{position:static;width:100%;flex-basis:auto;max-height:none;order:-1;padding:10px 8px}
     .nav-title{display:none}
-    .nav-links{display:flex;flex-wrap:wrap;gap:8px}
-    .nav a{flex:0 1 auto}
-    .result-count{margin-inline-start:0;width:100%;order:5}
-    .toolbar{gap:8px 10px}
+    .nav-links{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+    .nav a{flex:0 0 auto}
   }
   @media (max-width:520px){
-    .brand-name{font-size:22px}
-    .brand-sub{font-size:13px}
-    .section-head h2{font-size:19px}
-    .card-head{padding:14px}
-    .meta{margin:2px 14px 14px}
-    .to-top{bottom:16px;left:16px}
+    .shell,.top-inner{padding-left:14px;padding-right:14px}
+    header.top{padding:28px 0 26px}
+    .brand-name{font-size:21px}
+    .brand-sub{font-size:12px}
+    .prepared{flex-wrap:wrap;gap:6px}
+    .tabs{gap:8px}
+    .tabs button{padding:10px 12px;gap:9px;border-radius:12px}
+    .tabs .t-ic{width:36px;height:36px;font-size:18px}
+    .tabs .t-main b{font-size:14px}
+    .tabs .t-main small{font-size:10px}
+    .tabs .t-cnt{font-size:13px;padding:2px 9px}
+    .stats{gap:10px}
+    .stat{padding:13px 14px}
+    .stat .num{font-size:23px}
+    .stat .lbl{font-size:12px}
+    .section-head{gap:10px}
+    .section-head .ico{width:38px;height:38px;font-size:19px}
+    .section-head h2{font-size:18px}
+    .card h3{font-size:15.5px}
+    .card-head{padding:13px;gap:10px}
+    .meta{margin:2px 13px 13px}
+    .to-top{bottom:16px;left:16px;width:42px;height:42px}
   }
 </style>
 </head>
