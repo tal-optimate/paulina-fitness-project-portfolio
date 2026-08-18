@@ -96,6 +96,7 @@
   .stat .lbl{font-size:13px;color:var(--ink-soft);margin-top:6px;font-weight:600}
   .stat.make .num{color:var(--make)}
   .stat.n8n .num{color:var(--n8n)}
+  .stat.manychat .num{color:#1565C0}
   .stat.active .num{color:var(--ok)}
   .stat.boards .num{color:#0E7A47}
   .stat.records .num{color:var(--accent-dark)}
@@ -132,6 +133,7 @@
   .seg button .cnt{font-size:11.5px;opacity:.85;font-weight:700}
   .seg button.on.mk{background:var(--make)}
   .seg button.on.nn{background:var(--n8n)}
+  .seg button.on.mc{background:#1565C0}
   .seg button.on.ok{background:var(--yellow-dark)}
 
   .tool-btn{
@@ -205,6 +207,7 @@
   .badge{font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
   .badge.make{background:var(--make-soft);color:var(--make)}
   .badge.n8n{background:var(--n8n-soft);color:var(--n8n)}
+  .badge.manychat{background:#E7F0FD;color:#1565C0}
   .badge.active{background:var(--ok-soft);color:var(--ok)}
   .badge.inactive{background:var(--off-soft);color:var(--off)}
   .badge.branch{background:#EAF3FF;color:#2563AB}
@@ -316,7 +319,7 @@
         <div class="logo">פ</div>
         <div>
           <div class="brand-name">פאולינה פיטנס</div>
-          <div class="brand-sub">תיק הפרויקט — אוטומציות (Make · n8n) ולוחות monday</div>
+          <div class="brand-sub">תיק הפרויקט — אוטומציות (Make · n8n · ManyChat) ולוחות monday</div>
         </div>
       </div>
       <div class="prepared">
@@ -332,7 +335,7 @@
     <div class="tabs" id="tabs">
       <button data-mode="auto" class="on">
         <span class="t-ic">⚙️</span>
-        <span class="t-main"><b>אוטומציות</b><small>Make · n8n</small></span>
+        <span class="t-main"><b>אוטומציות</b><small>Make · n8n · ManyChat</small></span>
         <span class="t-cnt" id="t-cnt-auto">0</span>
       </button>
       <button data-mode="monday" class="md">
@@ -347,7 +350,7 @@
       <div class="stat"><div class="num" id="s-total">0</div><div class="lbl">סה״כ אוטומציות</div></div>
       <div class="stat make"><div class="num" id="s-make">0</div><div class="lbl">Make.com</div></div>
       <div class="stat n8n"><div class="num" id="s-n8n">0</div><div class="lbl">n8n</div></div>
-      <div class="stat active"><div class="num" id="s-active">0</div><div class="lbl">פעילות כרגע</div></div>
+      <div class="stat manychat"><div class="num" id="s-manychat">0</div><div class="lbl">ManyChat</div></div>
     </div>
 
     <!-- ===================== STATS (monday) ===================== -->
@@ -371,6 +374,7 @@
           <button data-pf="all" class="on">הכל <span class="cnt" id="c-all"></span></button>
           <button data-pf="make" class="mk">Make <span class="cnt" id="c-make"></span></button>
           <button data-pf="n8n" class="nn">n8n <span class="cnt" id="c-n8n"></span></button>
+          <button data-pf="manychat" class="mc">ManyChat <span class="cnt" id="c-manychat"></span></button>
         </div>
         <span class="fl-label auto-only">סטטוס</span>
         <div class="seg auto-only" id="status-seg">
@@ -486,6 +490,47 @@ const AUTOMATIONS = [
       "איסוף פרטי הלקוח (שם וטלפון)",
       "העברת הליד להמשך טיפול"
     ]
+  },
+  {
+    "id": "mc-content20260113163542_305939",
+    "name": "הודעה ראשונית ללידים שמגיעים מפייסבוק ואינסטגרם",
+    "category": "leads",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "פייסבוק",
+      "אינסטגרם"
+    ],
+    "description": "פלואו ששולח הודעת פתיחה ראשונית ללידים שמגיעים דרך פייסבוק ואינסטגרם, כדי לפתוח איתם את השיחה.",
+    "trigger": "נשלח כשמתקבל ליד חדש מפייסבוק או אינסטגרם",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20260211095546_878828",
+    "name": "סדנת אונליין 31.3",
+    "category": "leads",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו המלווה את הנרשמות לסדנת האונליין בתאריך 31.3, לטיפול בפניות והרשמה.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: סדנאות אונליין"
+  },
+  {
+    "id": "mc-content20251217140802_256776",
+    "name": "סדנת הרזיה וחיטוב 13.1",
+    "category": "leads",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו המלווה את הנרשמות לסדנת ההרזיה והחיטוב בתאריך 13.1, לטיפול בפניות והרשמה.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: סדנאות אונליין"
   },
   {
     "id": "make-9319997",
@@ -623,6 +668,34 @@ const AUTOMATIONS = [
       "אם בחרה 09:00–12:00 – מסמנת זאת בכרטיס",
       "אם בחרה 12:00–16:00 – מסמנת זאת בכרטיס"
     ]
+  },
+  {
+    "id": "mc-content20260217135152_819477",
+    "name": "בוט ווטסאפ חדש",
+    "category": "newbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "וואטסאפ"
+    ],
+    "description": "הפלואו המרכזי של הבוט החדש בוואטסאפ, שמנהל את השיחה הראשונית עם הפונים.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: בוט ווטסאפ חדש"
+  },
+  {
+    "id": "mc-content20260616104237_575310",
+    "name": "סוכן זיהה שהלידה מעוניינת בסדנאות הרזיה",
+    "category": "newbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "וואטסאפ"
+    ],
+    "description": "פלואו שמופעל כשהבוט מזהה שהלידה מתעניינת בסדנאות הרזיה, כדי להמשיך איתה בשיחה המתאימה.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: בוט ווטסאפ חדש"
   },
   {
     "id": "n8n-iU6z6sIdxgzetp3V",
@@ -815,6 +888,113 @@ const AUTOMATIONS = [
       "איסוף נתוני השקילות ובדיקה אם הלקוח חבר בקבוצת הוואטסאפ של 10%",
       "החזרת כל המידע המרוכז לצ׳אטבוט לצורך מתן מענה ללקוח"
     ]
+  },
+  {
+    "id": "mc-content20251123144954_272778",
+    "name": "לקוח מעוניין בהקפאת מנוי - שליחת הודעה לניירי",
+    "category": "chatbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמטפל בפנייה של לקוח שמעוניין להקפיא את המנוי שלו, ושולח על כך הודעה לניירי.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: שירות לקוחות"
+  },
+  {
+    "id": "mc-content20260108091109_594171",
+    "name": "לקוח מעוניין לבטל את המנוי שלו",
+    "category": "chatbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמטפל בפנייה של לקוח שמעוניין לבטל את המנוי שלו.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: שירות לקוחות"
+  },
+  {
+    "id": "mc-content20260108091008_184850",
+    "name": "לקוח מעוניין לשנות את המנוי שלו",
+    "category": "chatbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמטפל בפנייה של לקוח שמעוניין לשנות את המנוי שלו.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: שירות לקוחות"
+  },
+  {
+    "id": "mc-content20260113111705_581572",
+    "name": "מענה אוטומטי באינסטגרם",
+    "category": "chatbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "אינסטגרם"
+    ],
+    "description": "פלואו שמספק מענה אוטומטי בברירת מחדל להודעות שמתקבלות באינסטגרם.",
+    "trigger": "כשמתקבלת הודעה נכנסת שאינה תואמת תפריט",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: default replies"
+  },
+  {
+    "id": "mc-content20251112161327_494855",
+    "name": "מענה אוטומטי בוואטסאפ",
+    "category": "chatbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "וואטסאפ"
+    ],
+    "description": "פלואו שמספק מענה אוטומטי בברירת מחדל להודעות שמתקבלות בוואטסאפ.",
+    "trigger": "כשמתקבלת הודעה נכנסת שאינה תואמת תפריט",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: default replies"
+  },
+  {
+    "id": "mc-content20260112101248_548113",
+    "name": "מענה אוטומטי בפייסבוק",
+    "category": "chatbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "פייסבוק"
+    ],
+    "description": "פלואו שמספק מענה אוטומטי בברירת מחדל להודעות שמתקבלות בפייסבוק.",
+    "trigger": "כשמתקבלת הודעה נכנסת שאינה תואמת תפריט",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: default replies"
+  },
+  {
+    "id": "mc-content20260406092130_030338",
+    "name": "שליחת הודעה לנציגה על ליד מכירות/שירות לקוחות כשלקוח מעוניין",
+    "category": "chatbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו ששולח התראה לנציגת המכירות או שירות הלקוחות כאשר מזוהה ליד או לקוח שמעוניין בליווי אנושי.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: שירות לקוחות"
+  },
+  {
+    "id": "mc-content20251218113607_179487",
+    "name": "שליחת הודעה לנציגת מכירות/שירות לקוחות כשלקוח מעוניין בנציג",
+    "category": "chatbot",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו ששולח התראה לנציגת המכירות או שירות הלקוחות כאשר לקוח מבקש לדבר עם נציג אנושי.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: שירות לקוחות"
   },
   {
     "id": "make-9282042",
@@ -1216,6 +1396,32 @@ const AUTOMATIONS = [
       "אם ההרשמה נמצאה – מעדכנת את הסטטוס שלה",
       "מסמנת 'פעיל' אם התשלום עבר או 'בתהליך' אם ממתין"
     ]
+  },
+  {
+    "id": "mc-content20251123140210_060320",
+    "name": "סירוב אשראי בחיפה",
+    "category": "billing",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמטפל במקרים של סירוב אשראי בחיוב מנוי בסניף חיפה.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: סירובי אשראי"
+  },
+  {
+    "id": "mc-content20251123140235_020137",
+    "name": "סירוב אשראי בנוף הגליל",
+    "category": "billing",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמטפל במקרים של סירוב אשראי בחיוב מנוי בסניף נוף הגליל.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: סירובי אשראי"
   },
   {
     "id": "make-8112678",
@@ -1722,6 +1928,149 @@ const AUTOMATIONS = [
     ]
   },
   {
+    "id": "mc-content20260429132410_846587",
+    "name": "אחרי 10 אימונים",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שנשלח למתאמנת לאחר שהשלימה 10 אימונים, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "נשלח לאחר השלמת 10 אימונים",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260430060959_593640",
+    "name": "אישור הגעה לאימון ניסיון",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו לאישור הגעה לאימון ניסיון, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260505110907_769280",
+    "name": "אישור הגעה לאימון ניסיון - נוף הגליל",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו לאישור הגעה לאימון ניסיון בסניף נוף הגליל, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260426134001_142172",
+    "name": "מערך ארבוקס - תזכורת אימון",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמזכיר למתאמנת על אימון קרוב, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "נשלח כתזכורת מתוזמנת לפני אימון",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260507042525_241810",
+    "name": "מערך ארבוקס - תזכורת אימון יום לפני",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמזכיר למתאמנת על האימון שלה יום מראש, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "נשלח כתזכורת מתוזמנת יום לפני האימון",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260426123846_688765",
+    "name": "מערך הודעות ארבוקס - יום הולדת",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמברך את המתאמנת ביום הולדתה, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "נשלח ביום ההולדת של המתאמנת",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260426130125_925351",
+    "name": "מערך הודעות ארבוקס - מיד כשמנוי מתעדכן",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמופעל מיד כאשר מנוי של מתאמנת מתעדכן, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "רץ מיד כשמנוי מתעדכן",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260428054211_535445",
+    "name": "מערך הודעות ארבוקס - סירוב אשראי",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמופעל כאשר יש סירוב אשראי בחיוב מנוי, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260430074251_694737",
+    "name": "נעדרה",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמופעל כאשר מתאמנת נעדרה מאימון, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260429124628_728763",
+    "name": "שלושה שבועות אחרי אימון ראשון",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שנשלח למתאמנת שלושה שבועות לאחר האימון הראשון שלה, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "נשלח שלושה שבועות לאחר האימון הראשון",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
+    "id": "mc-content20260428064445_738420",
+    "name": "שעה אחרי אימון ראשון",
+    "category": "arbox",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שנשלח למתאמנת שעה לאחר האימון הראשון שלה, כחלק ממערך ההודעות המחובר למערכת ארבוקס.",
+    "trigger": "נשלח שעה לאחר האימון הראשון",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: מערך הודעות ארבוקס"
+  },
+  {
     "id": "make-9126105",
     "name": "לקוחה חדשה - מיד עם עדכון המנוי - חיפה",
     "category": "arbox",
@@ -1833,6 +2182,71 @@ const AUTOMATIONS = [
       "סימון הלקוח לרשימת דיוור נוף הגליל (אם קיים בבוט)",
       "עדכון כרטיס הלקוח במאנדיי - סימון הוצאת דיוור ותאריכי דיוור ואיפוס"
     ]
+  },
+  {
+    "id": "mc-content20260225102321_283503",
+    "name": "דיוור אונליין",
+    "category": "broadcast",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו דיוור המיועד לקהל האונליין, לשליחת עדכון או מסר יזום לרשימת התפוצה.",
+    "trigger": "נשלח כדיוור יזום לרשימת תפוצה",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20250714083328_107118",
+    "name": "הודעת תפוצה יום לאחר הוובינר",
+    "category": "broadcast",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו תפוצה שנשלח יום לאחר הוובינר, כדי לחזור אל המשתתפים עם מסר המשך.",
+    "trigger": "נשלח כדיוור יזום יום לאחר הוובינר",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20250525132112_206999",
+    "name": "תפוצה אונליין",
+    "category": "broadcast",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו תפוצה המיועד לקהל האונליין, לשליחת מסר יזום לרשימת התפוצה.",
+    "trigger": "נשלח כדיוור יזום לרשימת תפוצה",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: דיוור"
+  },
+  {
+    "id": "mc-content20250525122713_885887",
+    "name": "תפוצה חיפה",
+    "category": "broadcast",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו תפוצה המיועד ללקוחות סניף חיפה, לשליחת מסר יזום לרשימת התפוצה.",
+    "trigger": "נשלח כדיוור יזום לרשימת תפוצה",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: דיוור"
+  },
+  {
+    "id": "mc-content20250525130632_166964",
+    "name": "תפוצה נוף הגליל",
+    "category": "broadcast",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו תפוצה המיועד ללקוחות סניף נוף הגליל, לשליחת מסר יזום לרשימת התפוצה.",
+    "trigger": "נשלח כדיוור יזום לרשימת תפוצה",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat · תיקייה: דיוור"
   },
   {
     "id": "make-5460580",
@@ -1951,6 +2365,250 @@ const AUTOMATIONS = [
       "מעבירה כל מי שקיבל הודעה לקבוצת \"נשלחה הודעת תפוצה\".",
       "מסירה מהמאגר מספרים שלא ניתן היה לשלוח אליהם."
     ]
+  },
+  {
+    "id": "mc-data-model",
+    "name": "ManyChat — תשתית הנתונים של הבוט",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "מבנה הנתונים שהצ׳אטבוט משתמש בו כדי לזהות, לתייג ולתעד לקוחות ולידים — 41 תגיות ו-46 שדות מותאמים.",
+    "note": "התגיות והשדות מנוהלים בתוך ManyChat ומשמשים את כל הפלואוז.",
+    "chipGroups": [
+      {
+        "label": "🏷️ תגיות (41)",
+        "items": [
+          "בתהליך עם הבוט",
+          "הגיעה משיווק",
+          "חזרה מהסוכן",
+          "בשיחה עם הסוכן",
+          "retro_phone_for_search",
+          "לא מנוי",
+          "מנוי",
+          "שליחת דיוור - מאגר אונליין",
+          "שליחת דיוור - מאגר נוף הגליל",
+          "שליחת דיוור - מאגר חיפה",
+          "נשלחה הודעת שיווק טסט טל וניירי",
+          "סדנת טסט טל וניירי",
+          "טסט",
+          "נשלחה הודעת שיווק סדנת הרזיה 31.3",
+          "סדנת אונליין 31.3",
+          "Online",
+          "pop-up",
+          "Nof-Hagalil",
+          "Haifa",
+          "needs_to_be_created_in_monday",
+          "מאגר אונליין1",
+          "מאגר אונליין 2",
+          "נשלחה הודעת שיווק סדנת אונליין 15.3",
+          "סדנת אונליין 15.3",
+          "מאגר נוף הגליל",
+          "מאגר חיפה",
+          "מאגר אונליין",
+          "טלפון עודכן",
+          "מתעניין 13.1",
+          "נשלחה הודעת שיווק סדנת הרזיה 13.1",
+          "סדנת אונליין 13.1",
+          "dont send messages",
+          "Customer_Service",
+          "נוף גליל",
+          "וובינר ספטמבר",
+          "וובינר קודם",
+          "וובינר",
+          "עודלוובינר",
+          "تمارين شد وCORE",
+          "بيلاتس بالأجهزة",
+          "تمارين قوة وتنسيق"
+        ]
+      },
+      {
+        "label": "🔤 שדות מותאמים (46)",
+        "items": [
+          "AI_Response",
+          "arbox_id",
+          "branch_location",
+          "class_amount",
+          "class_hour",
+          "class_type",
+          "client_arbox_link",
+          "client_manychat_chat_link",
+          "client_manychat_name",
+          "client_manychat_phone",
+          "client_monday_link",
+          "f_name",
+          "haifa_location_link",
+          "interested_in",
+          "is_client?",
+          "is_sub",
+          "lead_or_client",
+          "monday_lead_id",
+          "monday_pulse_id",
+          "new_client_link",
+          "num_messages",
+          "phone",
+          "phone_for_search",
+          "platform",
+          "restore_payment_link",
+          "schedule_id_re",
+          "sub_branch",
+          "sub_name",
+          "valid_phone?",
+          "בוט_חדש_במה_התעניינה",
+          "טלפון למציאה",
+          "מנוי נוכחי",
+          "מס׳ ימי הקפאה השנה",
+          "משתנה סוכן סדנא",
+          "מתי_נוח_נציג",
+          "סדנאות_כמה_לרדת",
+          "סדנאות_סניף",
+          "סרטון טיפים",
+          "פופאפ_קרוב_ימים",
+          "פופאפ_קרוב_שעה",
+          "פופאפ_קרוב_תאריך",
+          "קישור לארבוקס",
+          "קישור למאנדיי",
+          "שדה עבור בדיקות",
+          "שם הלקוח במאנדיי",
+          "שפה_לבוט"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mc-content20260310141923_615322",
+    "name": "הגדרת מספר טלפון לחיפוש עבור כל איש קשר חדש",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו טכני שמגדיר מספר טלפון לחיפוש עבור כל איש קשר חדש שנכנס, כדי שיהיה קל לאתר אותו במערכת.",
+    "trigger": "רץ עבור כל איש קשר חדש",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20260624094853_834590",
+    "name": "הורדת תגית \"בתהליך עם הבוט\" לאחר חצי שעה",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמסיר את התגית \"בתהליך עם הבוט\" מאיש הקשר לאחר חצי שעה, כדי לשמור על סימון מסודר של מי נמצא כרגע בשיחה עם הבוט.",
+    "trigger": "רץ אוטומטית חצי שעה לאחר קבלת התגית",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20250709104247_243688",
+    "name": "מענה ל\"וובינר\"",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו שמגיב לפונים שכותבים \"וובינר\", ומפנה אותם להמשך התהליך.",
+    "trigger": "כשפונה כותב \"וובינר\"",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20250711131318_145662",
+    "name": "מענה ל\"וובינר\" בפייסבוק",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "פייסבוק"
+    ],
+    "description": "פלואו שמגיב לפונים שכותבים \"וובינר\" בפייסבוק, ומפנה אותם להמשך התהליך.",
+    "trigger": "כשפונה כותב \"וובינר\" בפייסבוק",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20250603081409_571779",
+    "name": "מענה ל\"פרטים\" בצ'אטבוט אינסטגרם",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "אינסטגרם"
+    ],
+    "description": "פלואו שמגיב לפונים שכותבים \"פרטים\" בצ'אטבוט באינסטגרם, ומספק להם מידע נוסף.",
+    "trigger": "כשפונה כותב \"פרטים\" באינסטגרם",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20250731101940_549920",
+    "name": "מענה ל\"פרטים\" בצ'אטבוט פייסבוק",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "פייסבוק"
+    ],
+    "description": "פלואו שמגיב לפונים שכותבים \"פרטים\" בצ'אטבוט בפייסבוק, ומספק להם מידע נוסף.",
+    "trigger": "כשפונה כותב \"פרטים\" בפייסבוק",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20250714124302_296804",
+    "name": "שליחת לינק לוובינר",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו ששולח לנרשמים את הקישור להשתתפות בוובינר.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20251118151758_028183",
+    "name": "שליחת תשובה ללקוחות/לידים מהבינה המלאכותית",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו ששולח ללקוחות ולידים את התשובה שהופקה על ידי הבינה המלאכותית.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20260310154220_655578",
+    "name": "שמירת מזהה טלפון (retro phone id)",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו טכני לשמירת מזהה מספר הטלפון של אנשי קשר קיימים, לצורך זיהוי מסודר במערכת.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
+  },
+  {
+    "id": "mc-content20260310153338_458569",
+    "name": "שמירת מספר טלפון לחיפוש (retro phone for search)",
+    "category": "general",
+    "platform": "manychat",
+    "status": "active",
+    "apps": [
+      "ManyChat"
+    ],
+    "description": "פלואו טכני שמסדר את מספר הטלפון של אנשי קשר קיימים כך שניתן יהיה לחפש אותם בקלות במערכת.",
+    "trigger": "",
+    "note": "התוכן המלא של הפלואו מנוהל בתוך ManyChat"
   },
   {
     "id": "make-8421670",
@@ -3088,7 +3746,7 @@ const BOARDS = [
   }
 ];
 
-const heFmt = { make:"Make.com", n8n:"n8n", monday:"monday" };
+const heFmt = { make:"Make.com", n8n:"n8n", monday:"monday", manychat:"ManyChat" };
 
 function branchOf(name){
   if(name.indexOf("נוף הגליל")>=0) return "נוף הגליל";
@@ -3127,6 +3785,8 @@ function cardHTML(a){
         <div class="meta">
           ${a.trigger?`<div class="meta-block"><div class="k">⚡ מתי זה רץ</div><div class="v">${a.trigger}</div></div>`:""}
           ${steps?`<div class="meta-block"><div class="k">📋 מה קורה בפועל</div><ol class="steps">${steps}</ol></div>`:""}
+          ${(a.chipGroups||[]).map(g=>`<div class="meta-block"><div class="k">${g.label}</div><div class="apps">${g.items.map(x=>`<span class="app-chip">${x}</span>`).join("")}</div></div>`).join("")}
+          ${a.note?`<div class="meta-block"><div class="k">ℹ️ הערה</div><div class="v">${a.note}</div></div>`:""}
         </div>
       </div></div>
     </article>`;
@@ -3238,10 +3898,11 @@ function fillStats(){
   // automations stat row + tab count
   const nMake = AUTOMATIONS.filter(a=>a.platform==="make").length;
   const nN8n  = AUTOMATIONS.filter(a=>a.platform==="n8n").length;
-  document.getElementById("s-total").textContent  = AUTOMATIONS.length;
-  document.getElementById("s-make").textContent   = nMake;
-  document.getElementById("s-n8n").textContent    = nN8n;
-  document.getElementById("s-active").textContent = AUTOMATIONS.filter(a=>a.status==="active").length;
+  const nMc   = AUTOMATIONS.filter(a=>a.platform==="manychat").length;
+  document.getElementById("s-total").textContent    = AUTOMATIONS.length;
+  document.getElementById("s-make").textContent     = nMake;
+  document.getElementById("s-n8n").textContent      = nN8n;
+  document.getElementById("s-manychat").textContent = nMc;
   document.getElementById("t-cnt-auto").textContent = AUTOMATIONS.length;
 
   // monday stat row + tab count
@@ -3255,9 +3916,10 @@ function fillStats(){
   document.getElementById("t-cnt-monday").textContent = BOARDS.length;
 
   // platform-seg counts (automations only)
-  document.getElementById("c-all").textContent  = AUTOMATIONS.length;
-  document.getElementById("c-make").textContent = nMake;
-  document.getElementById("c-n8n").textContent  = nN8n;
+  document.getElementById("c-all").textContent      = AUTOMATIONS.length;
+  document.getElementById("c-make").textContent     = nMake;
+  document.getElementById("c-n8n").textContent      = nN8n;
+  document.getElementById("c-manychat").textContent = nMc;
 }
 
 function setMode(mode){
