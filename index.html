@@ -1,0 +1,3369 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ספר האוטומציות — פאולינה פיטנס</title>
+<style>
+  /* ===================== Design tokens ===================== */
+  :root{
+    --accent:#7C3AED;          /* purple primary accent */
+    --accent-dark:#6D28D9;
+    --accent-soft:#F1EAFE;
+    --yellow:#F5B301;          /* yellow secondary accent */
+    --yellow-dark:#C98A00;
+    --yellow-soft:#FEF3D0;
+    --make:#6D4AFF;            /* Make.com brand-ish purple */
+    --make-soft:#EEEAFF;
+    --n8n:#EA4B71;             /* n8n brand-ish pink/red */
+    --n8n-soft:#FDE9EF;
+    --ok:#C98A00;
+    --ok-soft:#FEF3D0;
+    --off:#9AA3AF;
+    --off-soft:#F0F1F3;
+    --bg:#F6F8FA;
+    --card:#FFFFFF;
+    --ink:#1A2230;
+    --ink-soft:#5B6672;
+    --line:#E7EBF0;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.06);
+    --radius:16px;
+    --sidebar-w:270px;
+    --maxw:960px;
+    font-synthesis-weight:none;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Assistant","Heebo","Segoe UI",system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+
+  /* ===================== Layout shell ===================== */
+  .shell{max-width:calc(var(--maxw) + var(--sidebar-w) + 64px);margin:0 auto;padding:0 24px}
+  .layout{display:flex;gap:32px;align-items:flex-start}
+
+  /* ===================== Header ===================== */
+  header.top{
+    background:linear-gradient(120deg,var(--accent-dark) 0%,var(--accent) 60%,#9D5BF0 100%);
+    color:#fff;padding:36px 0 30px;
+    border-bottom:4px solid var(--yellow);
+  }
+  .top-inner{max-width:calc(var(--maxw) + var(--sidebar-w) + 64px);margin:0 auto;padding:0 24px}
+  .brand-row{display:flex;align-items:center;gap:14px}
+  .logo{
+    width:52px;height:52px;border-radius:14px;background:var(--yellow);color:var(--accent-dark);
+    display:grid;place-items:center;font-weight:800;font-size:22px;letter-spacing:-1px;
+    box-shadow:0 4px 12px rgba(245,179,1,.4);
+  }
+  .brand-name{font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .brand-sub{font-size:15px;opacity:.92;font-weight:500;margin-top:2px}
+  .prepared{margin-top:16px;font-size:13px;opacity:.85;display:flex;align-items:center;gap:8px}
+  .prepared .dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.6)}
+
+  /* ===================== Tabs ===================== */
+  .tabs{display:flex;gap:12px;margin:-30px 0 0;position:relative;z-index:3}
+  .tabs button{
+    flex:1;display:flex;align-items:center;gap:13px;text-align:start;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+    padding:14px 18px;cursor:pointer;font-family:inherit;transition:border-color .18s,box-shadow .18s;
+  }
+  .tabs button:hover{border-color:#D9C7F7}
+  .tabs button.on{border-color:var(--accent);box-shadow:0 8px 24px rgba(124,58,237,.16)}
+  .tabs button.md.on{border-color:#0E7A47;box-shadow:0 8px 24px rgba(14,122,71,.16)}
+  .tabs .t-ic{flex:0 0 auto;width:46px;height:46px;border-radius:12px;background:var(--bg);display:grid;place-items:center;font-size:22px}
+  .tabs button.on .t-ic{background:var(--accent-soft)}
+  .tabs button.md.on .t-ic{background:#D9F2E4}
+  .tabs .t-main{display:flex;flex-direction:column;line-height:1.25;flex:1;min-width:0}
+  .tabs .t-main b{font-size:16px;font-weight:800;color:var(--ink)}
+  .tabs .t-main small{font-size:11.5px;color:var(--off);font-weight:600}
+  .tabs .t-cnt{flex:0 0 auto;font-size:15px;font-weight:800;color:var(--ink-soft);background:var(--off-soft);padding:3px 13px;border-radius:20px}
+  .tabs button.on .t-cnt{color:var(--accent-dark);background:var(--accent-soft)}
+  .tabs button.md.on .t-cnt{color:#0E7A47;background:#D9F2E4}
+
+  /* ===================== Stats ===================== */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:16px 0 0;position:relative;z-index:2}
+  .stats.hidden{display:none}
+  .stat{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;box-shadow:var(--shadow);
+  }
+  .stat .num{font-size:30px;font-weight:800;line-height:1;letter-spacing:-1px}
+  .stat .lbl{font-size:13px;color:var(--ink-soft);margin-top:6px;font-weight:600}
+  .stat.make .num{color:var(--make)}
+  .stat.n8n .num{color:var(--n8n)}
+  .stat.active .num{color:var(--ok)}
+  .stat.boards .num{color:#0E7A47}
+  .stat.records .num{color:var(--accent-dark)}
+  .auto-only.hidden{display:none}
+
+  /* ===================== Sticky toolbar ===================== */
+  .toolbar-wrap{position:sticky;top:0;z-index:30;background:var(--bg);padding:14px 0 12px;margin-top:20px}
+  .toolbar{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+    padding:10px 12px;display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;
+  }
+  .search{position:relative;flex:1 1 240px;min-width:200px}
+  .search input{
+    width:100%;font-family:inherit;font-size:15px;color:var(--ink);
+    border:1px solid var(--line);background:var(--bg);border-radius:10px;
+    padding:10px 40px 10px 14px;outline:none;transition:border-color .15s,box-shadow .15s;
+  }
+  .search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .search input::placeholder{color:var(--off)}
+  .search .si{position:absolute;top:50%;right:13px;transform:translateY(-50%);font-size:15px;opacity:.5;pointer-events:none}
+  .search .clr{position:absolute;top:50%;left:8px;transform:translateY(-50%);border:0;background:var(--off-soft);color:var(--ink-soft);
+    width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:13px;line-height:1;display:none}
+  .search.has .clr{display:grid;place-items:center}
+
+  .fl-label{font-size:12px;font-weight:700;color:var(--off);margin-inline-end:-6px}
+  .seg{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .seg button{
+    border:0;background:transparent;cursor:pointer;font-family:inherit;
+    font-size:13.5px;font-weight:700;color:var(--ink-soft);padding:6px 13px;border-radius:8px;transition:all .15s;
+    display:flex;align-items:center;gap:6px;white-space:nowrap;
+  }
+  .seg button:hover{color:var(--ink)}
+  .seg button.on{background:var(--accent);color:#fff}
+  .seg button .cnt{font-size:11.5px;opacity:.85;font-weight:700}
+  .seg button.on.mk{background:var(--make)}
+  .seg button.on.nn{background:var(--n8n)}
+  .seg button.on.ok{background:var(--yellow-dark)}
+
+  .tool-btn{
+    border:1px solid var(--line);background:var(--bg);cursor:pointer;font-family:inherit;
+    font-size:13.5px;font-weight:700;color:var(--ink-soft);padding:8px 13px;border-radius:10px;
+    display:flex;align-items:center;gap:6px;transition:all .15s;
+  }
+  .tool-btn:hover{border-color:var(--accent);color:var(--accent-dark);background:var(--accent-soft)}
+  .result-count{font-size:13px;color:var(--ink-soft);font-weight:600;margin-inline-start:auto;white-space:nowrap}
+  .result-count b{color:var(--accent-dark)}
+
+  /* ===================== Body grid ===================== */
+  .body-wrap{padding:8px 0 90px}
+
+  /* Sidebar */
+  aside.nav{
+    width:var(--sidebar-w);flex:0 0 var(--sidebar-w);position:sticky;top:84px;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;box-shadow:var(--shadow);max-height:calc(100vh - 104px);overflow-y:auto;
+  }
+  .nav-title{font-size:12px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;padding:6px 10px 10px}
+  .nav a{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:10px 12px;border-radius:10px;font-size:15px;font-weight:600;color:var(--ink-soft);
+    transition:background .15s,color .15s;
+  }
+  .nav a:hover{background:var(--accent-soft);color:var(--accent-dark)}
+  .nav a.active{background:var(--accent);color:#fff}
+  .nav a .count{
+    font-size:12px;font-weight:700;background:var(--off-soft);color:var(--ink-soft);
+    padding:1px 8px;border-radius:20px;min-width:22px;text-align:center;
+  }
+  .nav a.active .count{background:rgba(255,255,255,.22);color:#fff}
+
+  /* Main */
+  main{flex:1 1 auto;min-width:0}
+  .section{margin-bottom:40px;scroll-margin-top:88px}
+  .section-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .section-head .ico{
+    width:42px;height:42px;border-radius:12px;background:var(--accent-soft);color:var(--accent-dark);
+    display:grid;place-items:center;font-size:21px;flex:0 0 auto;
+  }
+  .section-head h2{font-size:21px;font-weight:800;margin:0;letter-spacing:-.4px;display:flex;align-items:center;gap:10px}
+  .section-head .sec-count{font-size:12.5px;font-weight:700;color:var(--accent-dark);background:var(--accent-soft);padding:2px 10px;border-radius:20px}
+  .section-head p{margin:2px 0 0;font-size:13.5px;color:var(--ink-soft)}
+
+  /* Automation card (collapsible) */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04);margin-bottom:12px;overflow:hidden;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  .card:hover{border-color:#D9C7F7;box-shadow:0 4px 16px rgba(124,58,237,.09)}
+  .card.open{border-color:#CBB4F5;box-shadow:0 6px 22px rgba(124,58,237,.10)}
+
+  .card-head{
+    width:100%;text-align:start;background:transparent;border:0;cursor:pointer;font-family:inherit;
+    display:flex;align-items:flex-start;gap:14px;padding:16px 18px;
+  }
+  .card-head .chev{
+    flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:var(--bg);color:var(--ink-soft);
+    display:grid;place-items:center;font-size:13px;margin-top:2px;transition:transform .28s ease,background .15s;
+  }
+  .card.open .card-head .chev{transform:rotate(180deg);background:var(--accent-soft);color:var(--accent-dark)}
+  .card-head:hover .chev{background:var(--accent-soft);color:var(--accent-dark)}
+  .card-main{flex:1 1 auto;min-width:0}
+  .card-title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .card h3{font-size:16.5px;font-weight:800;margin:0;letter-spacing:-.3px;color:var(--ink)}
+
+  .badges{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .badge{font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .badge.make{background:var(--make-soft);color:var(--make)}
+  .badge.n8n{background:var(--n8n-soft);color:var(--n8n)}
+  .badge.active{background:var(--ok-soft);color:var(--ok)}
+  .badge.inactive{background:var(--off-soft);color:var(--off)}
+  .badge.branch{background:#EAF3FF;color:#2563AB}
+  .badge.monday{background:#D9F2E4;color:#0E7A47}
+  .badge.count-badge{background:var(--off-soft);color:var(--ink-soft)}
+  .badge.kind{background:#F3EEFB;color:var(--accent-dark)}
+  .badge .pip{width:7px;height:7px;border-radius:50%;background:currentColor}
+
+  .desc{font-size:14.5px;color:var(--ink-soft);margin:8px 0 0;line-height:1.55}
+
+  .apps{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .app-chip{
+    font-size:11.5px;font-weight:600;color:var(--accent-dark);background:var(--accent-soft);
+    border:1px solid #E3D4FB;padding:3px 9px;border-radius:8px;
+  }
+
+  /* board fields & groups */
+  .group-pill{
+    font-size:12px;font-weight:600;color:var(--accent-dark);background:var(--accent-soft);
+    border:1px solid #E3D4FB;padding:3px 11px;border-radius:20px;
+  }
+  .field-chip{
+    font-size:12px;font-weight:600;color:var(--ink);background:var(--bg);border:1px solid var(--line);
+    padding:4px 10px;border-radius:8px;display:inline-flex;gap:7px;align-items:center;
+  }
+  .field-chip em{font-style:normal;font-size:10.5px;color:var(--off);font-weight:700}
+
+  /* sidebar sub-heading (monday) */
+  .nav-sub{
+    font-size:11px;font-weight:800;color:#0E7A47;letter-spacing:.4px;
+    padding:14px 10px 8px;margin-top:8px;border-top:1px solid var(--line);
+    display:flex;align-items:center;gap:6px;
+  }
+  .seg button.on.md{background:#0E7A47}
+
+  /* collapsible body */
+  .card-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+  .card.open .card-body{grid-template-rows:1fr}
+  .card-body-inner{overflow:hidden;min-height:0}
+  .meta{margin:2px 18px 18px;display:grid;gap:12px}
+  .meta-block{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .meta-block .k{font-size:12px;font-weight:700;color:var(--accent-dark);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .meta-block .v{font-size:14.5px;color:var(--ink)}
+  .steps{margin:0;padding:0;list-style:none;counter-reset:s}
+  .steps li{
+    position:relative;padding:6px 34px 6px 0;font-size:14.5px;counter-increment:s;
+  }
+  .steps li::before{
+    content:counter(s);position:absolute;right:0;top:5px;
+    width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;
+    font-size:12px;font-weight:700;display:grid;place-items:center;
+  }
+  .steps li:not(:last-child)::after{
+    content:"";position:absolute;right:10.5px;top:27px;bottom:-2px;width:1.5px;background:var(--line);
+  }
+
+  /* Empty state */
+  .empty{
+    border:1.5px dashed var(--line);border-radius:var(--radius);padding:28px;text-align:center;
+    color:var(--ink-soft);font-size:14.5px;background:rgba(255,255,255,.5);
+  }
+  .empty strong{color:var(--ink)}
+
+  footer{
+    text-align:center;color:var(--ink-soft);font-size:13px;padding:28px 0 40px;border-top:1px solid var(--line);
+  }
+  footer .oi{font-weight:800;color:var(--accent-dark)}
+
+  /* ===================== Back to top ===================== */
+  .to-top{
+    position:fixed;bottom:24px;left:24px;z-index:40;
+    width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;
+    background:var(--accent);color:#fff;font-size:20px;box-shadow:0 6px 18px rgba(124,58,237,.4);
+    display:grid;place-items:center;opacity:0;transform:translateY(12px) scale(.9);pointer-events:none;
+    transition:opacity .2s,transform .2s;
+  }
+  .to-top.show{opacity:1;transform:none;pointer-events:auto}
+  .to-top:hover{background:var(--accent-dark)}
+
+  /* ===================== Responsive ===================== */
+  @media (max-width:860px){
+    .stats{grid-template-columns:repeat(2,1fr);gap:12px}
+    .stat{padding:14px 16px}
+    .stat .num{font-size:26px}
+    .layout{flex-direction:column}
+    aside.nav{position:static;width:100%;flex-basis:auto;max-height:none;order:-1}
+    .nav-title{display:none}
+    .nav-links{display:flex;flex-wrap:wrap;gap:8px}
+    .nav a{flex:0 1 auto}
+    .result-count{margin-inline-start:0;width:100%;order:5}
+    .toolbar{gap:8px 10px}
+  }
+  @media (max-width:520px){
+    .brand-name{font-size:22px}
+    .brand-sub{font-size:13px}
+    .section-head h2{font-size:19px}
+    .card-head{padding:14px}
+    .meta{margin:2px 14px 14px}
+    .to-top{bottom:16px;left:16px}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand-row">
+        <div class="logo">פ</div>
+        <div>
+          <div class="brand-name">פאולינה פיטנס</div>
+          <div class="brand-sub">תיק הפרויקט — אוטומציות (Make · n8n) ולוחות monday</div>
+        </div>
+      </div>
+      <div class="prepared">
+        <span>הוכן עבורכם ע״י Optimate</span>
+        <span class="dot"></span>
+        <span id="doc-date">עודכן לאחרונה: 18.08.2026</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- ===================== TABS ===================== -->
+    <div class="tabs" id="tabs">
+      <button data-mode="auto" class="on">
+        <span class="t-ic">⚙️</span>
+        <span class="t-main"><b>אוטומציות</b><small>Make · n8n</small></span>
+        <span class="t-cnt" id="t-cnt-auto">0</span>
+      </button>
+      <button data-mode="monday" class="md">
+        <span class="t-ic">📋</span>
+        <span class="t-main"><b>monday</b><small>לוחות ונתונים</small></span>
+        <span class="t-cnt" id="t-cnt-monday">0</span>
+      </button>
+    </div>
+
+    <!-- ===================== STATS (אוטומציות) ===================== -->
+    <div class="stats" id="stats-auto">
+      <div class="stat"><div class="num" id="s-total">0</div><div class="lbl">סה״כ אוטומציות</div></div>
+      <div class="stat make"><div class="num" id="s-make">0</div><div class="lbl">Make.com</div></div>
+      <div class="stat n8n"><div class="num" id="s-n8n">0</div><div class="lbl">n8n</div></div>
+      <div class="stat active"><div class="num" id="s-active">0</div><div class="lbl">פעילות כרגע</div></div>
+    </div>
+
+    <!-- ===================== STATS (monday) ===================== -->
+    <div class="stats hidden" id="stats-monday">
+      <div class="stat boards"><div class="num" id="mb-s-boards">0</div><div class="lbl">לוחות</div></div>
+      <div class="stat records"><div class="num" id="mb-s-records">0</div><div class="lbl">רשומות סה״כ</div></div>
+      <div class="stat"><div class="num" id="mb-s-cats">0</div><div class="lbl">קטגוריות</div></div>
+      <div class="stat"><div class="num" id="mb-s-fields">0</div><div class="lbl">שדות בלוחות</div></div>
+    </div>
+
+    <!-- ===================== TOOLBAR ===================== -->
+    <div class="toolbar-wrap">
+      <div class="toolbar">
+        <div class="search" id="search-wrap">
+          <span class="si">🔍</span>
+          <input type="search" id="search" placeholder="חיפוש לפי שם, תיאור או מערכת…" autocomplete="off">
+          <button class="clr" id="search-clear" title="נקה" aria-label="נקה חיפוש">✕</button>
+        </div>
+        <span class="fl-label auto-only">פלטפורמה</span>
+        <div class="seg auto-only" id="platform-seg">
+          <button data-pf="all" class="on">הכל <span class="cnt" id="c-all"></span></button>
+          <button data-pf="make" class="mk">Make <span class="cnt" id="c-make"></span></button>
+          <button data-pf="n8n" class="nn">n8n <span class="cnt" id="c-n8n"></span></button>
+        </div>
+        <span class="fl-label auto-only">סטטוס</span>
+        <div class="seg auto-only" id="status-seg">
+          <button data-st="all" class="on">הכל</button>
+          <button data-st="active" class="ok">פעילות</button>
+          <button data-st="inactive">לא פעילות</button>
+        </div>
+        <button class="tool-btn" id="toggle-all"><span id="toggle-all-ico">⊕</span> <span id="toggle-all-txt">פתח הכל</span></button>
+        <span class="result-count" id="result-count"></span>
+      </div>
+    </div>
+
+    <!-- ===================== BODY ===================== -->
+    <div class="body-wrap">
+      <div class="layout">
+        <aside class="nav">
+          <div class="nav-title">קטגוריות</div>
+          <div class="nav-links" id="nav-links"></div>
+        </aside>
+        <main id="main"></main>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>ספר האוטומציות של פאולינה פיטנס · הוכן ע״י <span class="oi">Optimate</span></div>
+  </footer>
+
+  <button class="to-top" id="to-top" title="חזרה למעלה" aria-label="חזרה למעלה">↑</button>
+
+<script>
+/* =========================================================================
+   DATA — כל האוטומציות מוגדרות כאן. כדי להוסיף אוטומציה, הוסיפו אובייקט חדש.
+   שדות:
+     id        – מזהה ייחודי (אנגלית, ללא רווחים)
+     name      – שם האוטומציה בעברית
+     category  – חייב להתאים ל-id של קטגוריה מרשימת CATEGORIES למטה
+     platform  – 'make' או 'n8n'
+     status    – 'active' או 'inactive'
+     description – מה זה עושה, בשפה פשוטה ללקוח
+     trigger   – מתי / מה מפעיל את האוטומציה
+     steps     – מערך של צעדים, מה קורה שלב-אחר-שלב (בשפה פשוטה)
+   ========================================================================= */
+
+const CATEGORIES = [
+  { id:"leads",     icon:"🎯", title:"לידים",                 desc:"קליטת פניות חדשות מפייסבוק, אינסטגרם וטפסים" },
+  { id:"newbot",    icon:"🤖", title:"בוט חדש",               desc:"בוט חכם שמסנן ומכשיר לידים אוטומטית" },
+  { id:"chatbot",   icon:"🧠", title:"צ׳אטבוט חכם (AI)",       desc:"מענה אוטומטי בוואטסאפ וזיהוי כוונות לקוח" },
+  { id:"manychat",  icon:"💬", title:"Manychat",              desc:"ניהול אנשי קשר ותגיות ברשתות ובוואטסאפ" },
+  { id:"subs",      icon:"💳", title:"מנויים",                desc:"מעקב אחר מצב מנויים: חידוש, ביטול והקפאה" },
+  { id:"billing",   icon:"💰", title:"סליקות ורכישות",        desc:"עיבוד הזמנות, רכישות וטיפול בסירובי אשראי" },
+  { id:"arbox",     icon:"🏋️", title:"הודעות ארבוקס",         desc:"הודעות אוטומטיות ללקוחות לאורך כל מסע האימון" },
+  { id:"broadcast", icon:"📢", title:"דיוור",                 desc:"ניהול רשימות תפוצה ושליחת הודעות ממוקדות" },
+  { id:"general",   icon:"📦", title:"כללי ומערכות ותיקות",   desc:"אוטומציות נוספות ותשתיות רקע" },
+];
+
+const AUTOMATIONS = [
+  {
+    "id": "make-8332380",
+    "name": "לידים מפייסבוק חדש",
+    "category": "leads",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "פייסבוק",
+      "monday.com",
+      "ManyChat"
+    ],
+    "description": "כל ליד חדש שמגיע מטופס בפייסבוק נקלט אוטומטית לכרטיס חדש במאנדיי, ובמקביל נשלחת אליו הודעה אישית בבוט לפי הסניף המתאים. כך אף פנייה לא הולכת לאיבוד והלקוח מקבל מענה מיידי.",
+    "trigger": "לקוח משאיר פרטים בטופס ליד בפייסבוק.",
+    "steps": [
+      "קליטת פרטי הליד החדש מהטופס בפייסבוק",
+      "סידור וניקוי מספר הטלפון",
+      "פתיחת כרטיס ליד חדש במאנדיי",
+      "בדיקה האם הלקוח כבר קיים בבוט (מאני צ׳אט)",
+      "שליחת הודעת המשך אוטומטית בבוט לפי הסניף (חיפה / נוף הגליל / אונליין)"
+    ]
+  },
+  {
+    "id": "make-9453686",
+    "name": "לידים מפייסבוק למאנדיי - דף עסקי חדש",
+    "category": "leads",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "פייסבוק",
+      "monday.com",
+      "ManyChat"
+    ],
+    "description": "אותה קליטת לידים אוטומטית, הפעם עבור הדף העסקי החדש בפייסבוק. כל פנייה נכנסת ישירות למאנדיי והלקוח מקבל הודעה אישית בבוט לפי הסניף.",
+    "trigger": "לקוח משאיר פרטים בטופס ליד בדף העסקי החדש בפייסבוק.",
+    "steps": [
+      "קליטת פרטי הליד החדש מהטופס בפייסבוק",
+      "סידור וניקוי מספר הטלפון",
+      "פתיחת כרטיס ליד חדש במאנדיי",
+      "בדיקה האם הלקוח כבר קיים בבוט (מאני צ׳אט)",
+      "שליחת הודעת המשך אוטומטית בבוט לפי הסניף (חיפה / נוף הגליל / אונליין)"
+    ]
+  },
+  {
+    "id": "make-8602924",
+    "name": "קליטת לידים מטופס - סדנאות בסניפים",
+    "category": "leads",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "פייסבוק"
+    ],
+    "description": "קליטה אוטומטית של לידים מהטופס הייעודי לסדנאות בסניפים. כל מי שמשאיר פרטים לסדנה נאסף מיד, כדי שאפשר יהיה לחזור אליו במהירות.",
+    "trigger": "לקוח משאיר פרטים בטופס הסדנאות בסניפים.",
+    "steps": [
+      "קליטת פנייה חדשה מטופס הסדנאות בסניפים",
+      "איסוף פרטי הלקוח (שם וטלפון)",
+      "העברת הליד להמשך טיפול"
+    ]
+  },
+  {
+    "id": "make-9319997",
+    "name": "בדיקת פופאפים קרובים ועדכון הבוט",
+    "category": "newbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "המערכת מוצאת במאנדיי את הפופאפים (מיני-אירועים) הקרובים ומעדכנת בבוט את התאריך, הימים והשעה, כדי שהבוט ימסור ללקוחה מידע מדויק ועדכני.",
+    "trigger": "הבוט מבקש מידע על פופאפים קרובים במהלך השיחה.",
+    "steps": [
+      "הבוט פונה למערכת כדי לבדוק אילו פופאפים קרובים",
+      "המערכת מחפשת במאנדיי את האירועים מסוג פופ-אפ",
+      "בודקת אם קיים פופאפ עתידי פעיל",
+      "מעדכנת בבוט את תאריך הפופאפ, הימים והשעה"
+    ]
+  },
+  {
+    "id": "make-8728487",
+    "name": "בוט חדש – בדיקה במאנדיי ויצירת ליד חדש",
+    "category": "newbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com",
+      "עיבוד מספרי טלפון"
+    ],
+    "description": "כשמתחילה שיחה חדשה עם הבוט, המערכת בודקת לפי מספר הטלפון אם האדם כבר קיים במאנדיי, ואם לא – פותחת עבורו כרטיס ליד חדש. כך כל פנייה נקלטת אוטומטית ולא הולכת לאיבוד.",
+    "trigger": "אדם מתחיל שיחה חדשה עם הבוט בוואטסאפ.",
+    "steps": [
+      "הבוט שולח את פרטי הפונה למערכת",
+      "המערכת מחפשת במאנדיי לפי מספר הטלפון אם האדם כבר קיים",
+      "מסדרת את מספר הטלפון בפורמט ישראלי תקין",
+      "פותחת כרטיס ליד חדש במאנדיי עם השם, הטלפון וקישור לשיחה, ומסמנת מקור \"בוט ווצאפ\"",
+      "שומרת את מספר הכרטיס במאנדיי בחזרה אצל הבוט לשימוש בהמשך"
+    ]
+  },
+  {
+    "id": "make-8728766",
+    "name": "בחרה באימונים – בדיקה אם לקוחה קיימת והפנייה לסוכן",
+    "category": "newbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com",
+      "עיבוד מספרי טלפון"
+    ],
+    "description": "כשלקוחה בוחרת באימונים, המערכת בודקת לפי הטלפון אם היא כבר לקוחה עם מנוי פעיל ובאיזה סניף, ומחזירה לבוט את התשובה כדי להפנות אותה נכון לסוכן המכירות.",
+    "trigger": "הלקוחה בוחרת \"אימונים\" בבוט.",
+    "steps": [
+      "הבוט שולח את מספר הטלפון של הלקוחה",
+      "המערכת מסדרת את הטלפון ומחפשת אותה במאנדיי",
+      "בודקת אם קיים לה מנוי מקושר והאם הוא פעיל",
+      "מחזירה לבוט אם היא לקוחה פעילה ובאיזה סניף",
+      "הבוט מפנה אותה בהתאם לסוכן המתאים"
+    ]
+  },
+  {
+    "id": "make-8728979",
+    "name": "בחרה באימונים/סדנאות/פופאפ – עדכון במאנדיי",
+    "category": "newbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "לפי מה שהלקוחה בחרה בבוט – אימונים, סדנאות או פופאפ – המערכת מעדכנת את כרטיס הליד במאנדיי, כך שצוות המכירות יודע בדיוק במה היא מתעניינת.",
+    "trigger": "הלקוחה בוחרת בבוט תחום עניין (אימונים / סדנאות / פופאפ).",
+    "steps": [
+      "הבוט מעביר את הבחירה של הלקוחה",
+      "המערכת מוודאת שקיים ללקוחה כרטיס במאנדיי",
+      "מעדכנת בכרטיס את התחום שבו התעניינה ואת המסגרת",
+      "אם בחרה בפופאפ – מסמנת זאת בשדה המסגרת"
+    ]
+  },
+  {
+    "id": "make-8729052",
+    "name": "עדכון במאנדיי – כמה קילו רוצה לרדת",
+    "category": "newbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "המערכת מעדכנת בכרטיס הליד במאנדיי את יעד ההרזיה שהלקוחה ציינה בבוט (עד 8 ק\"ג, 8–15 או מעל 15), כדי שאפשר יהיה להתאים לה את ההצעה הנכונה.",
+    "trigger": "הלקוחה מציינת בבוט בכמה קילו היא רוצה לרדת.",
+    "steps": [
+      "הבוט מעביר את יעד ההרזיה של הלקוחה",
+      "המערכת מוודאת שקיים לה כרטיס במאנדיי",
+      "בודקת את הטווח שבחרה: עד 8, 8–15 או מעל 15 ק\"ג",
+      "מעדכנת את השדה המתאים בכרטיס במאנדיי"
+    ]
+  },
+  {
+    "id": "make-8729023",
+    "name": "עדכון במאנדיי – לאיזה סניף הסדנה הרצויה",
+    "category": "newbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "לפי הסניף שהלקוחה בחרה לסדנה – חיפה או נוף הגליל – המערכת מעדכנת את כרטיס הליד במאנדיי, כך שהפנייה משויכת לסניף הנכון.",
+    "trigger": "הלקוחה בוחרת בבוט סניף לסדנה.",
+    "steps": [
+      "הבוט מעביר את הסניף שבחרה הלקוחה",
+      "המערכת מוודאת שקיים לה כרטיס במאנדיי",
+      "אם בחרה חיפה – מעדכנת את הכרטיס לסניף חיפה",
+      "אם בחרה נוף הגליל – מעדכנת את הכרטיס לסניף נוף הגליל"
+    ]
+  },
+  {
+    "id": "make-8728633",
+    "name": "עדכון במאנדיי – מתי נוח להתקשר ללקוחה",
+    "category": "newbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "המערכת מעדכנת בכרטיס הליד במאנדיי את שעת השיחה המועדפת שהלקוחה בחרה בבוט, כדי שהצוות יתקשר אליה בזמן הנוח לה.",
+    "trigger": "הלקוחה בוחרת בבוט מתי נוח לה שיחזרו אליה.",
+    "steps": [
+      "הבוט מעביר את שעת השיחה המועדפת של הלקוחה",
+      "המערכת מוודאת שקיים ללקוחה כרטיס במאנדיי",
+      "אם בחרה 09:00–12:00 – מסמנת זאת בכרטיס",
+      "אם בחרה 12:00–16:00 – מסמנת זאת בכרטיס"
+    ]
+  },
+  {
+    "id": "n8n-iU6z6sIdxgzetp3V",
+    "name": "הודעת המשך אוטומטית ללקוחות שנעלמו באמצע השיחה",
+    "category": "chatbot",
+    "platform": "n8n",
+    "status": "active",
+    "apps": [
+      "וואטסאפ",
+      "בינה מלאכותית (OpenAI)",
+      "מאגר ידע (Supabase)"
+    ],
+    "description": "כשלקוחה מפסיקה להגיב באמצע שיחה בוואטסאפ, המערכת שולחת לה אחרי כשעה הודעת המשך חמה ואישית שממשיכה בדיוק מהמקום שבו נעצרה השיחה. כך פחות פניות הולכות לאיבוד ויותר לקוחות ממשיכות את התהליך.",
+    "trigger": "כל 10 דקות, ובשעות הפעילות בלבד (09:00-21:00), המערכת בודקת אילו שיחות נשארו ללא מענה.",
+    "steps": [
+      "מאתרת שיחות שבהן ההודעה האחרונה נשלחה מאיתנו לפני כשעה והלקוחה עדיין לא הגיבה",
+      "מדלגת על לקוחות שכבר סיימו בנימוס (למשל 'תודה', 'ביי', 'לא מעוניינת')",
+      "מנתחת את תוכן השיחה כדי להבין על מה בדיוק דיברתן",
+      "מנסחת בעזרת בינה מלאכותית הודעת המשך קצרה ואישית בעברית, בסגנון וואטסאפ",
+      "שולחת את ההודעה ללקוחה דרך הוואטסאפ",
+      "מוודאת שכל לקוחה מקבלת לכל היותר הודעת המשך אחת ביממה"
+    ]
+  },
+  {
+    "id": "n8n-Z57S1wirCvQ4dLj4",
+    "name": "העוזרת החכמה של פאולינה פיטנס - מוח ה-AI לצ'אט הוואטסאפ",
+    "category": "chatbot",
+    "platform": "n8n",
+    "status": "active",
+    "apps": [
+      "וואטסאפ",
+      "בינה מלאכותית (OpenAI)",
+      "Arbox",
+      "Google Drive",
+      "Google Docs",
+      "Google Sheets",
+      "מאגר ידע (Supabase)",
+      "monday.com",
+      "ManyChat",
+      "Make.com"
+    ],
+    "description": "זהו המוח החכם שמאחורי הצ'אט בוט בוואטסאפ: עוזרת AI שמנהלת שיחה טבעית עם לקוחות ומתעניינים בעברית ובערבית, עונה על שאלות לפי מאגר הידע של הסטודיו, ויודעת להתאים תשובות לפי הסניף (חיפה או נוף הגליל) ולפי הפרטים האישיים של הפונה. היא נותנת מידע על מנויים ומחירים, לוחות אימונים, קביעת אימון ניסיון, וטיפול בבקשות של מנויים - ובמקרה הצורך מעבירה בעדינות לנציגה אנושית.",
+    "trigger": "נכנס אוטומטית לפעולה בכל פעם שמגיעה הודעה חדשה מהלקוחה בצ'אט הוואטסאפ שמנוהל דרך המערכת.",
+    "steps": [
+      "מקבלת את הודעת הלקוחה יחד עם הפרטים שלה (סניף שבחרה, שפה, מספר טלפון) וזוכרת את ההיסטוריה של השיחה כדי להמשיך ברצף.",
+      "מבינה מה הלקוחה מבקשת ושולפת מידע מדויק ממאגר הידע של הסטודיו - פרטים על מנויים, מחירים, סדנאות והסברים.",
+      "בודקת בזמן אמת את הסטטוס האישי של הפונה: איזה מנוי יש לה, באיזה סניף, ולאילו סדנאות היא רשומה.",
+      "מספקת את לוח האימונים והשעות של הסניף הרלוונטי, ומלווה בתהליך קביעת אימון ניסיון עד לקבלת קישור הרשמה אמיתי מ-Arbox.",
+      "מטפלת בבקשות של מנויות - הקפאה, שינוי או ביטול מנוי - על ידי העברת הבקשה לצוות האנושי לטיפול.",
+      "מזהה מתי צריך מגע אנושי ומעבירה בעדינות לנציגה, וכן מפנה מתעניינות בירידה במשקל לתפריט הסדנאות הייעודי.",
+      "ברקע, מעדכנת אוטומטית את מאגר הידע שלה מקבצים ומסמכים בגוגל דרייב, כדי שהתשובות תמיד יהיו מדויקות ועדכניות."
+    ]
+  },
+  {
+    "id": "n8n-T0tei3tdgslvDArT",
+    "name": "זיהוי לקוח או ליד לפי מספר טלפון ושליפת פרטי מנוי וסניף",
+    "category": "chatbot",
+    "platform": "n8n",
+    "status": "active",
+    "apps": [
+      "monday.com",
+      "Make.com",
+      "וואטסאפ"
+    ],
+    "description": "כשמישהו כותב בוואטסאפ, התהליך בודק לפי מספר הטלפון האם מדובר בלקוח קיים או בליד חדש. עבור לקוח קיים הוא שולף אוטומטית את שמו, סוג המנוי שלו והסניף (חיפה או נוף הגליל), כדי שהצ'אטבוט יוכל להעניק מענה אישי ומדויק.",
+    "trigger": "מופעל על ידי תהליך אחר (מוח הצ'אטבוט) עם מספר הטלפון של הפונה בוואטסאפ.",
+    "steps": [
+      "מקבל את מספר הטלפון של מי ששלח את ההודעה",
+      "מחפש את המספר בטבלת הלקוחות ב-Monday",
+      "אם המספר לא נמצא, מסמן שמדובר בליד חדש",
+      "אם המספר נמצא, מושך פרטי מנוי מורחבים דרך Make",
+      "בודק מול לוח נוסף ב-Monday מהו הסניף של הלקוח (חיפה או נוף הגליל)",
+      "מזהה את שם הלקוח, סוג המנוי והסניף המתאים",
+      "מחזיר לצ'אטבוט את פרטי הלקוח כדי לתת מענה אישי"
+    ]
+  },
+  {
+    "id": "n8n-EbucUuWUvd9bt4KB",
+    "name": "שליפת הסדנאות והמנויים הפעילים",
+    "category": "chatbot",
+    "platform": "n8n",
+    "status": "active",
+    "apps": [
+      "monday.com"
+    ],
+    "description": "תהליך עזר ששולף מהלוחות של פאולינה את כל הסדנאות והמנויים שפעילים כרגע, כדי שהעוזר החכם בוואטסאפ יוכל לתת ללקוחות מידע מדויק ומעודכן על ההצעות, המחירים וקישורי התשלום. כך הלקוחות תמיד מקבלים את המידע הנכון בלי צורך לעדכן ידנית.",
+    "trigger": "התהליך מופעל אוטומטית על ידי תהליך אחר (העוזר החכם) כשצריך לשלוף מידע עדכני על סדנאות ומנויים.",
+    "steps": [
+      "מקבל בקשה מהעוזר החכם של פאולינה",
+      "שולף מהלוח בMonday את כל הסדנאות שמסומנות כפעילות",
+      "מסדר את פרטי הסדנאות: שם, סוג, קטגוריה, תאריך התחלה, מחיר, הנחות, הסבר וקישור לתשלום",
+      "שולף את כל המנויים הפעילים בסניפים חיפה ונוף הגליל",
+      "מסדר את פרטי המנויים: שם, סניף, מחיר, הסבר וקישור לתשלום",
+      "מוודא שהמנויים שייכים לאחד הסניפים ומחזיר את הרשימות המסודרות לעוזר החכם"
+    ]
+  },
+  {
+    "id": "n8n-W2XgSNNp14qa7MXZ",
+    "name": "שליפת מערכת שעות אימונים לפי סניף (מתוך Arbox)",
+    "category": "chatbot",
+    "platform": "n8n",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "n8n"
+    ],
+    "description": "כלי עזר חכם שמושך את לוח האימונים הקרוב מהמערכת של Arbox עבור הסניף המבוקש. כך כשלקוח שואל בוואטסאפ מה יש בלוח, הבוט יכול לתת לו את שעות האימונים המעודכנות ישירות מהמערכת בלי שתצטרכו לבדוק ידנית.",
+    "trigger": "הכלי מופעל על ידי בוט השיחה (n8n) כשלקוח מבקש לדעת מה יש בלוח האימונים, ומקבל את שם הסניף.",
+    "steps": [
+      "מזהה לאיזה סניף מתייחסת הבקשה - חיפה או נוף הגליל.",
+      "פונה למערכת Arbox של אותו סניף ומושך את לוח האימונים ל-5 הימים הקרובים.",
+      "מסנן ומסדר את הפרטים החשובים לכל אימון: שם האימון, שם המאמן, תאריך ושעת התחלה וסיום, והאם האימון בוטל.",
+      "מאחד את כל האימונים לרשימה מסודרת ומחזיר אותה לבוט כדי שיציג ללקוח תשובה ברורה.",
+      "אם שם הסניף לא תקין, מחזיר הודעה שמבקשת לוודא שמדובר בחיפה או בנוף הגליל."
+    ]
+  },
+  {
+    "id": "make-8047552",
+    "name": "הודעת וואטסאפ נכנסת מלקוח -> העברת ההודעה והפרטים לסוכן החכם",
+    "category": "chatbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "וואטסאפ",
+      "סוכן AI (n8n)"
+    ],
+    "description": "כשלקוח שולח הודעת וואטסאפ, האוטומציה אוספת את פרטי הלקוח ומעבירה את ההודעה לסוכן החכם שמנהל את השיחה. כך כל פנייה מטופלת אוטומטית ומיד.",
+    "trigger": "לקוח שולח הודעת וואטסאפ שמגיעה דרך מערכת הצ׳אט.",
+    "steps": [
+      "קבלת הודעת הוואטסאפ הנכנסת מהלקוח",
+      "שליפת פרטי הלקוח (שם, טלפון, סניף, שפה ותוכן ההודעה)",
+      "בדיקה שהלקוח נמצא במצב שיחה עם הסוכן החכם",
+      "העברת ההודעה וכל הפרטים לסוכן החכם שממשיך את השיחה"
+    ]
+  },
+  {
+    "id": "make-8144857",
+    "name": "הצ׳אטבוט מזהה שלקוח מעוניין בהקפאת מנוי -> שליחת הודעה לניירי",
+    "category": "chatbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "monday.com",
+      "וואטסאפ"
+    ],
+    "description": "כשהצ׳אטבוט מזהה שלקוח רוצה להקפיא מנוי, האוטומציה אוספת את פרטי הלקוח ושולחת לניירי הודעה מסודרת עם כל המידע. כך הבקשה מטופלת מהר ובלי לפספס פרטים.",
+    "trigger": "הצ׳אטבוט מזהה שלקוח מבקש להקפיא את המנוי שלו.",
+    "steps": [
+      "איתור הלקוח בבורד הלקוחות במאנדיי לפי מספר הטלפון",
+      "איסוף פרטי המנוי: המנוי הנוכחי, מספר ימי ההקפאה שנוצלו השנה וקישורים לכרטיס הלקוח",
+      "הזנת הפרטים לתבנית ההודעה",
+      "שליחת הודעה עם כל הפרטים לניירי לטיפול בהקפאה"
+    ]
+  },
+  {
+    "id": "make-8331995",
+    "name": "הצ׳אטבוט מזהה שלקוח מעוניין בנציג אנושי -> שליחת הודעה לנציגות",
+    "category": "chatbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "וואטסאפ",
+      "monday.com"
+    ],
+    "description": "כשלקוח מבקש לדבר עם נציג אנושי, האוטומציה מזהה אם מדובר במנוי או בלקוח חדש, מעדכנת את בורד הלידים, ושולחת לנציגות הודעה עם שם הלקוח, הטלפון וקישור ישיר לשיחה. כך אף פנייה לא נופלת בין הכיסאות.",
+    "trigger": "הצ׳אטבוט מזהה שלקוח מבקש לדבר עם נציג אנושי.",
+    "steps": [
+      "שליפת פרטי הלקוח וסימונו בתגית מתאימה",
+      "הפרדה בין לקוח מנוי לבין לקוח שאינו מנוי",
+      "איתור או עדכון הלקוח בבורד ניהול הלידים במאנדיי, כולל סימון שההגעה היא מבוט הוואטסאפ",
+      "הזנת שם הלקוח, הטלפון וקישור לשיחה לתבנית ההודעה",
+      "שליחת הודעה לנציגות עם כל הפרטים כדי שיחזרו ללקוח"
+    ]
+  },
+  {
+    "id": "make-8181607",
+    "name": "קבלת כל המידע על הלקוח",
+    "category": "chatbot",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "monday.com"
+    ],
+    "description": "האוטומציה אוספת עבור הצ׳אטבוט את התמונה המלאה של הלקוח: המנויים הפעילים, הסדנאות הקרובות, נתוני השקילות והשתייכות לקבוצת הוואטסאפ. כך הצ׳אטבוט עונה ללקוח עם מידע מדויק ואישי.",
+    "trigger": "הצ׳אטבוט מבקש את מלוא המידע על לקוח מסוים.",
+    "steps": [
+      "שליפת כרטיס הלקוח מבורד הלקוחות במאנדיי",
+      "איסוף המנויים הפעילים בלבד של הלקוח",
+      "איסוף הסדנאות העתידיות שאליהן הלקוח רשום",
+      "איסוף נתוני השקילות ובדיקה אם הלקוח חבר בקבוצת הוואטסאפ של 10%",
+      "החזרת כל המידע המרוכז לצ׳אטבוט לצורך מתן מענה ללקוח"
+    ]
+  },
+  {
+    "id": "make-9282042",
+    "name": "בדיקה לגבי כל המנויים",
+    "category": "chatbot",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "Arbox",
+      "monday.com"
+    ],
+    "description": "האוטומציה מסנכרנת את המנויים הפעילים ממערכת ארבוקס אל המאנדיי: מוודאת שכל לקוח קיים בבורד הלקוחות ויוצרת רישום מנוי מקושר. כך נתוני המנויים במאנדיי נשארים מעודכנים.",
+    "trigger": "רץ אוטומטית כל 15 דקות.",
+    "steps": [
+      "שליפת כל המנויים הפעילים ממערכת ארבוקס",
+      "מעבר על כל מנוי ואיתור הלקוח בבורד הלקוחות במאנדיי לפי טלפון",
+      "יצירת כרטיס לקוח חדש במאנדיי אם הוא עדיין לא קיים",
+      "זיהוי סוג המנוי המתאים בבורד המנויים",
+      "יצירת רישום מנוי מקושר ללקוח, כולל תאריכי התחלה וסיום"
+    ]
+  },
+  {
+    "id": "make-8053091",
+    "name": "בורד המנויים מתעדכן -> עדכון הגוגל שיטס של המנויים עבור הצ׳אטבוט",
+    "category": "chatbot",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "monday.com",
+      "Google Sheets"
+    ],
+    "description": "כשבורד המנויים במאנדיי מתעדכן, האוטומציה נועדה לרענן את גיליון המנויים בגוגל שיטס שממנו הצ׳אטבוט שואב נתונים. כך המידע שהצ׳אטבוט מוסר על מנויים נשאר מעודכן.",
+    "trigger": "מתבצע שינוי בבורד המנויים במאנדיי.",
+    "steps": [
+      "זיהוי שינוי בבורד המנויים במאנדיי",
+      "העברת הנתונים המעודכנים לגיליון המנויים בגוגל שיטס",
+      "הצ׳אטבוט קורא את הנתונים המעודכנים מהגיליון"
+    ]
+  },
+  {
+    "id": "make-8053085",
+    "name": "בורד הסדנאות מתעדכן -> עדכון הגוגל שיטס של הסדנאות עבור הצ׳אטבוט",
+    "category": "chatbot",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "monday.com",
+      "Google Sheets"
+    ],
+    "description": "כשבורד הסדנאות במאנדיי מתעדכן, האוטומציה נועדה לרענן את גיליון הסדנאות בגוגל שיטס שממנו הצ׳אטבוט שואב נתונים. כך המידע שהצ׳אטבוט מוסר על סדנאות נשאר מעודכן.",
+    "trigger": "מתבצע שינוי בבורד הסדנאות במאנדיי.",
+    "steps": [
+      "זיהוי שינוי בבורד הסדנאות במאנדיי",
+      "העברת הנתונים המעודכנים לגיליון הסדנאות בגוגל שיטס",
+      "הצ׳אטבוט קורא את הנתונים המעודכנים מהגיליון"
+    ]
+  },
+  {
+    "id": "make-8351998",
+    "name": "איש קשר ביקש להסיר עצמו מרשימת התפוצה -> הסרתו ממאגר אונליין במאנדיי",
+    "category": "manychat",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com",
+      "בדיקת מספרי טלפון",
+      "Webhook"
+    ],
+    "description": "כשאיש קשר מבקש להפסיק לקבל הודעות תפוצה, המערכת מסירה אותו אוטומטית ממאגר האונליין במאנדיי. כך רשימת התפוצה נשארת נקייה ומכבדת את בקשות הנמענים.",
+    "trigger": "איש קשר לוחץ על 'הסרה' מרשימת התפוצה.",
+    "steps": [
+      "מזהה את מספר הטלפון של איש הקשר",
+      "מחפש אותו במאגר האונליין לפי שתי צורות של המספר",
+      "אם נמצא, מוציא את הכרטיס שלו מהמאגר (העברה לארכיון)"
+    ]
+  },
+  {
+    "id": "make-8466339",
+    "name": "בדיקת תקינות מספרי טלפון מתגובות אוטומטיות בפייסבוק ואינסטגרם",
+    "category": "manychat",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "בדיקת מספרי טלפון",
+      "Webhook"
+    ],
+    "description": "כשמתעניין משאיר מספר טלפון בתגובה אוטומטית בפייסבוק או באינסטגרם, המערכת בודקת שהמספר אמיתי ותקין ושומרת אותו ככרטיס איש קשר במאנצ'אט. כך לא מתבזבז זמן על מספרים שגויים ואף פנייה לא נופלת בין הכיסאות.",
+    "trigger": "מתעניין משאיר מספר טלפון בתגובה אוטומטית בפייסבוק או באינסטגרם.",
+    "steps": [
+      "שולפת את פרטי איש הקשר מהמאנצ'אט",
+      "בודקת שהמספר שנמסר הוא מספר טלפון ישראלי תקין",
+      "מחזירה תשובה לבוט אם המספר תקין או לא",
+      "מחפשת אם כבר קיים איש קשר עם המספר הזה",
+      "אם לא קיים, יוצרת איש קשר חדש במאנצ'אט",
+      "שולחת הודעת פתיחה ומסמנת מאיזו פלטפורמה הגיע"
+    ]
+  },
+  {
+    "id": "make-8469470",
+    "name": "יצירת ליד בבורד מאגר לידים שהגיעו מפייסבוק ואינסטגרם",
+    "category": "manychat",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com",
+      "Webhook"
+    ],
+    "description": "כשמתעניין חדש פונה דרך פייסבוק או אינסטגרם, המערכת יוצרת עבורו ליד מסודר בבורד הייעודי במאנדיי, כולל שם, טלפון וסימון הפלטפורמה שממנה הגיע. כך כל פנייה מהרשתות החברתיות מתועדת ומוכנה למעקב.",
+    "trigger": "מתעניין חדש פונה דרך פייסבוק או אינסטגרם.",
+    "steps": [
+      "שולף את פרטי איש הקשר מהמאנצ'אט",
+      "יוצר ליד חדש בבורד מאגר הלידים מפייסבוק ואינסטגרם",
+      "ממלא שם, מספר טלפון ומזהה איש הקשר",
+      "מסמן אם הליד הגיע מאינסטגרם או מפייסבוק"
+    ]
+  },
+  {
+    "id": "make-8494197",
+    "name": "ליד או לקוח חדש נכנס לבורד לידים/לקוחות -> יצירת איש קשר במאנצ'אט עם התיוג המתאים",
+    "category": "manychat",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "monday.com",
+      "ManyChat",
+      "בדיקת מספרי טלפון"
+    ],
+    "description": "כשנכנס ליד חדש או לקוח חדש לבורדים במאנדיי, המערכת יוצרת עבורו כרטיס איש קשר במאנצ'אט ומסמנת אותו בתיוג המתאים לפי הסניף והמוצר. כך כל פנייה מנוהלת מסודר וניתן לשלוח הודעות ממוקדות לקהל הנכון.",
+    "trigger": "נוצר כרטיס חדש בבורד הלידים או בבורד הלקוחות במאנדיי.",
+    "steps": [
+      "מזהה אם הכרטיס הגיע מבורד הלידים או מבורד הלקוחות",
+      "שולף את פרטי הליד או הלקוח מהמאנדיי",
+      "קובע את התיוג המתאים לפי הסניף והמוצר (נוף הגליל, חיפה, אונליין או פופאפ)",
+      "בודק שהמספר תקין ויוצר איש קשר במאנצ'אט (או מאתר קיים)",
+      "מסמן את איש הקשר בתיוגים ובקישור לכרטיס במאנדיי",
+      "עבור לקוחות, מוסיף תיוגים גם לפי סוגי המנויים שלהם"
+    ]
+  },
+  {
+    "id": "make-8434542",
+    "name": "לקוחה מבקשת לבטל מנוי -> שליחת הודעה לניירי במאנצ'אט",
+    "category": "manychat",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com",
+      "בדיקת מספרי טלפון",
+      "Webhook"
+    ],
+    "description": "כשלקוחה מבקשת דרך הבוט לבטל את המנוי שלה, המערכת מאתרת את הכרטיס שלה במאנדיי ושולחת לניירי ולשירות הלקוחות הודעה מסודרת עם כל הפרטים והקישורים. כך הטיפול בבקשת הביטול מהיר ואישי.",
+    "trigger": "לקוחה מבקשת לבטל את המנוי שלה דרך הבוט.",
+    "steps": [
+      "מזהה את מספר הטלפון של הלקוחה",
+      "מחפשת את כרטיס הלקוחה בבורד הלקוחות במאנדיי",
+      "מכינה קישורים לכרטיס במאנדיי ולארבוקס",
+      "ממלאת את פרטי הלקוחה בהודעה (שם, טלפון וקישורים)",
+      "שולחת לניירי הודעה על בקשת הביטול במאנצ'אט",
+      "שולחת הודעה מקבילה גם לשירות הלקוחות"
+    ]
+  },
+  {
+    "id": "make-8434538",
+    "name": "לקוחה מבקשת לשנות מנוי -> שליחת הודעה לניירי במאנצ'אט",
+    "category": "manychat",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com",
+      "בדיקת מספרי טלפון",
+      "Webhook"
+    ],
+    "description": "כשלקוחה מבקשת דרך הבוט לשנות את המנוי שלה, המערכת מאתרת את הכרטיס שלה במאנדיי ושולחת לניירי ולשירות הלקוחות הודעה עם כל הפרטים והקישורים. כך אף בקשת שינוי לא נשכחת והטיפול בה זריז.",
+    "trigger": "לקוחה מבקשת לשנות את המנוי שלה דרך הבוט.",
+    "steps": [
+      "מזהה את מספר הטלפון של הלקוחה",
+      "מחפשת את כרטיס הלקוחה בבורד הלקוחות במאנדיי",
+      "מכינה קישורים לכרטיס במאנדיי ולארבוקס",
+      "ממלאת את פרטי הלקוחה בהודעה (שם, טלפון וקישורים)",
+      "שולחת לניירי הודעה על בקשת השינוי במאנצ'אט",
+      "שולחת הודעה מקבילה גם לשירות הלקוחות"
+    ]
+  },
+  {
+    "id": "make-8452131",
+    "name": "סדנת הרזיה וחיטוב ינואר -> לקוחה בחרה שעה שיחזרו אליה",
+    "category": "manychat",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com",
+      "Webhook"
+    ],
+    "description": "כשמשתתפת בסדנת ההרזיה והחיטוב בוחרת בבוט את השעה הנוחה לה לחזרה טלפונית, המערכת מעדכנת זאת אוטומטית בכרטיס הליד שלה במאנדיי. כך הצוות יודע בדיוק מתי מתאים לחזור אליה ולא מפספס.",
+    "trigger": "משתתפת בסדנה בוחרת בבוט את השעה הנוחה לה לחזרה טלפונית.",
+    "steps": [
+      "שולף את פרטי המשתתפת מהמאנצ'אט",
+      "מאתר את כרטיס הליד שלה בבורד ניהול הלידים במאנדיי",
+      "מעדכן בכרטיס את שעת השיחה המועדפת שבחרה"
+    ]
+  },
+  {
+    "id": "make-8378827",
+    "name": "סדנת הרזיה וחיטוב ינואר -> לקוחה לחצה שהיא מעוניינת",
+    "category": "manychat",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com",
+      "Webhook"
+    ],
+    "description": "כשמשתתפת בסדנת ההרזיה והחיטוב מסמנת בבוט שהיא מעוניינת, המערכת פותחת עבורה אוטומטית ליד חדש בבורד ניהול הלידים במאנדיי. כך כל מתעניינת נכנסת מיד למעקב ולא נשכחת.",
+    "trigger": "משתתפת בסדנה לוחצת בבוט שהיא מעוניינת.",
+    "steps": [
+      "שולף את פרטי המשתתפת מהמאנצ'אט",
+      "יוצר ליד חדש בבורד ניהול הלידים במאנדיי",
+      "ממלא את מספר הטלפון של המשתתפת",
+      "מסמן את מקור הליד, הסטטוס 'ליד חדש' והשיוך לתפוצת אונליין"
+    ]
+  },
+  {
+    "id": "make-8435363",
+    "name": "ליד חדש נכנס למאגרי התפוצה (אונליין/נוף הגליל/חיפה) -> יצירתו במאנצ'אט עם התיוג המתאים",
+    "category": "manychat",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "monday.com",
+      "ManyChat",
+      "בדיקת מספרי טלפון"
+    ],
+    "description": "כשנכנס ליד חדש לאחד ממאגרי התפוצה במאנדיי (אונליין, נוף הגליל או חיפה), המערכת יוצרת עבורו איש קשר במאנצ'אט ומסמנת אותו בתיוג לפי המאגר שאליו שייך. כך אפשר לשלוח לו הודעות תפוצה מותאמות לסניף שלו.",
+    "trigger": "נוצר כרטיס ליד חדש באחד ממאגרי התפוצה: אונליין, נוף הגליל או חיפה.",
+    "steps": [
+      "שולף את פרטי הליד מהמאנדיי",
+      "מזהה מאיזה מאגר תפוצה הגיע וקובע את התיוג המתאים",
+      "בודק שהמספר תקין",
+      "יוצר איש קשר במאנצ'אט (או מאתר קיים לפי המספר)",
+      "מסמן את איש הקשר בתיוגי המאגר והסניף ובקישור לכרטיס במאנדיי"
+    ]
+  },
+  {
+    "id": "make-9282425",
+    "name": "מנוי בוטל - חיפה",
+    "category": "subs",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "monday.com"
+    ],
+    "description": "כשמנוי מבוטל בארבוקס בסניף חיפה, האוטומציה מאתרת את הלקוחה בלוח הניהול ומעדכנת אוטומטית שהמנוי בוטל. כך התמונה בלוח תמיד מדויקת בלי צורך לעדכן ידנית.",
+    "trigger": "מופעל כשמנוי מבוטל בארבוקס בסניף חיפה.",
+    "steps": [
+      "מזהה את ביטול המנוי בארבוקס",
+      "מאתר את פרטי הלקוחה לפי מספר הטלפון",
+      "מוצא את כרטיס הלקוחה בלוח הניהול (מאנדיי)",
+      "מעדכן את סטטוס המנוי ל'בוטל מצד הלקוח'"
+    ]
+  },
+  {
+    "id": "make-9282470",
+    "name": "מנוי בוטל - נוף הגליל",
+    "category": "subs",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "monday.com"
+    ],
+    "description": "כשמנוי מבוטל בארבוקס בסניף נוף הגליל, האוטומציה מאתרת את הלקוחה בלוח הניהול ומעדכנת אוטומטית שהמנוי בוטל. כך התמונה בלוח תמיד מדויקת בלי צורך לעדכן ידנית.",
+    "trigger": "מופעל כשמנוי מבוטל בארבוקס בסניף נוף הגליל.",
+    "steps": [
+      "מזהה את ביטול המנוי בארבוקס",
+      "מאתר את פרטי הלקוחה לפי מספר הטלפון",
+      "מוצא את כרטיס הלקוחה בלוח הניהול (מאנדיי)",
+      "מעדכן את סטטוס המנוי ל'בוטל מצד הלקוח'"
+    ]
+  },
+  {
+    "id": "make-9282433",
+    "name": "מנוי חודש או נוצר - חיפה",
+    "category": "subs",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "monday.com"
+    ],
+    "description": "כשמנוי מתחדש או נפתח בארבוקס בסניף חיפה, האוטומציה מוודאת שללקוחה יש כרטיס מעודכן בלוח הניהול ומסמנת אותה כפעילה. אם עדיין אין כרטיס - היא יוצרת אחד חדש.",
+    "trigger": "מופעל כשמנוי מתחדש או נוצר בארבוקס בסניף חיפה.",
+    "steps": [
+      "מזהה חידוש או פתיחת מנוי בארבוקס",
+      "מאתר את הלקוחה בלוח הניהול לפי טלפון ושם",
+      "אם קיים כבר כרטיס מנוי - מעדכן אותו לסטטוס 'פעיל'",
+      "אם אין כרטיס - יוצר כרטיס מנוי חדש ומסמן כפעיל",
+      "מעדכן את תאריך סיום המנוי"
+    ]
+  },
+  {
+    "id": "make-9282476",
+    "name": "מנוי חודש או נוצר - נוף הגליל",
+    "category": "subs",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "monday.com"
+    ],
+    "description": "כשמנוי מתחדש או נפתח בארבוקס בסניף נוף הגליל, האוטומציה מוודאת שללקוחה יש כרטיס מעודכן בלוח הניהול ומסמנת אותה כפעילה. אם עדיין אין כרטיס - היא יוצרת אחד חדש.",
+    "trigger": "מופעל כשמנוי מתחדש או נוצר בארבוקס בסניף נוף הגליל.",
+    "steps": [
+      "מזהה חידוש או פתיחת מנוי בארבוקס",
+      "מאתר את הלקוחה בלוח הניהול לפי טלפון ושם",
+      "אם קיים כבר כרטיס מנוי - מעדכן אותו לסטטוס 'פעיל'",
+      "אם אין כרטיס - יוצר כרטיס מנוי חדש ומסמן כפעיל",
+      "מעדכן את תאריך סיום המנוי"
+    ]
+  },
+  {
+    "id": "make-9282408",
+    "name": "מנוי מושהה - חיפה",
+    "category": "subs",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "monday.com"
+    ],
+    "description": "כשמנוי מוקפא (מושהה) בארבוקס בסניף חיפה, האוטומציה מסמנת את הלקוחה כ'מושהה' בלוח הניהול ורושמת את תאריך ההשהיה. כך קל לעקוב מי בהקפאה בכל רגע נתון.",
+    "trigger": "מופעל כשמנוי מושהה (מוקפא) בארבוקס בסניף חיפה.",
+    "steps": [
+      "מזהה השהיית מנוי בארבוקס",
+      "מאתר את כרטיס הלקוחה בלוח הניהול לפי מספר הטלפון",
+      "מעדכן את סטטוס המנוי ל'מושהה'",
+      "רושם את תאריך ההשהיה"
+    ]
+  },
+  {
+    "id": "make-9282466",
+    "name": "מנוי מושהה - נוף הגליל",
+    "category": "subs",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "monday.com"
+    ],
+    "description": "כשמנוי מוקפא (מושהה) בארבוקס בסניף נוף הגליל, האוטומציה מסמנת את הלקוחה כ'מושהה' בלוח הניהול ורושמת את תאריך ההשהיה. כך קל לעקוב מי בהקפאה בכל רגע נתון.",
+    "trigger": "מופעל כשמנוי מושהה (מוקפא) בארבוקס בסניף נוף הגליל.",
+    "steps": [
+      "מזהה השהיית מנוי בארבוקס",
+      "מאתר את כרטיס הלקוחה בלוח הניהול לפי מספר הטלפון",
+      "מעדכן את סטטוס המנוי ל'מושהה'",
+      "רושם את תאריך ההשהיה"
+    ]
+  },
+  {
+    "id": "make-8307724",
+    "name": "הזמנה חדשה נוצרה באתר",
+    "category": "billing",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "אתר האינטרנט (הזמנות)",
+      "monday.com"
+    ],
+    "description": "כשמתקבלת הזמנה חדשה באתר, האוטומציה בודקת אם הלקוח כבר קיים אצלנו ואם לא – פותחת לו כרטיס לקוח, ואז רושמת אותו אוטומטית לסדנא או למנוי שרכש. כך כל הזמנה נכנסת מסודרת למערכת בלי הקלדה ידנית.",
+    "trigger": "לקוח מבצע הזמנה חדשה באתר.",
+    "steps": [
+      "מקבלת את פרטי ההזמנה מהאתר",
+      "מחפשת לפי טלפון ואימייל אם הלקוח כבר קיים",
+      "אם הלקוח חדש – פותחת עבורו כרטיס לקוח",
+      "בודקת אם הסדנא שנרכשה כבר קיימת ואם לא – יוצרת אותה",
+      "רושמת את הלקוח לסדנא או למנוי שרכש"
+    ]
+  },
+  {
+    "id": "make-8307666",
+    "name": "עדכון הזמנה מהאתר",
+    "category": "billing",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "אתר האינטרנט (הזמנות)",
+      "monday.com"
+    ],
+    "description": "כשמתעדכן סטטוס של הזמנה קיימת באתר, האוטומציה מוצאת את ההרשמה המתאימה ומעדכנת אצלנו את הסטטוס בהתאם – פעיל אם התשלום עבר, או בתהליך אם עדיין ממתין. כך הסטטוסים תמיד מסונכרנים.",
+    "trigger": "סטטוס של הזמנה קיימת מתעדכן באתר.",
+    "steps": [
+      "מקבלת את עדכון ההזמנה מהאתר",
+      "מאתרת את ההרשמה לפי מזהה ההזמנה",
+      "אם ההרשמה נמצאה – מעדכנת את הסטטוס שלה",
+      "מסמנת 'פעיל' אם התשלום עבר או 'בתהליך' אם ממתין"
+    ]
+  },
+  {
+    "id": "make-8112678",
+    "name": "לקוח רכש סדנא או מנוי – עדכון הרכישה בארבוקס",
+    "category": "billing",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "אתר האינטרנט (הזמנות)",
+      "Arbox"
+    ],
+    "description": "כשלקוח רוכש סדנא או מנוי, האוטומציה מקבלת את פרטי הרכישה ומעדכנת אותה אוטומטית בכרטיס הלקוח בארבוקס. כך הרכישות נרשמות במקום אחד בלי עדכון ידני.",
+    "trigger": "לקוח רוכש סדנא או מנוי.",
+    "steps": [
+      "מקבלת את פרטי הרכישה של הלקוח",
+      "מזהה את הלקוח ואת הסדנא או המנוי שנרכשו",
+      "מעדכנת את הרכישה בכרטיס הלקוח בארבוקס"
+    ]
+  },
+  {
+    "id": "make-8323462",
+    "name": "מעקב לקוחות חדשים – חיפה",
+    "category": "billing",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "Arbox"
+    ],
+    "description": "האוטומציה עוקבת אחרי לקוחות חדשים שנרשמים בסניף חיפה בארבוקס, ומזהה כל לקוח חדש שנכנס למערכת. כך אפשר להמשיך ולטפל בו אוטומטית.",
+    "trigger": "לקוח חדש נרשם בארבוקס בסניף חיפה.",
+    "steps": [
+      "בודקת בארבוקס באופן קבוע אם נוסף לקוח חדש בחיפה",
+      "מזהה את הלקוח החדש ואת פרטיו",
+      "מעבירה את הפרטים להמשך טיפול אוטומטי"
+    ]
+  },
+  {
+    "id": "make-8323472",
+    "name": "מעקב לקוחות חדשים – נוף הגליל",
+    "category": "billing",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "Arbox"
+    ],
+    "description": "האוטומציה עוקבת אחרי לקוחות חדשים שנרשמים בסניף נוף הגליל בארבוקס, ומזהה כל לקוח חדש שנכנס למערכת. כך אפשר להמשיך ולטפל בו אוטומטית.",
+    "trigger": "לקוח חדש נרשם בארבוקס בסניף נוף הגליל.",
+    "steps": [
+      "בודקת בארבוקס באופן קבוע אם נוסף לקוח חדש בנוף הגליל",
+      "מזהה את הלקוח החדש ואת פרטיו",
+      "מעבירה את הפרטים להמשך טיפול אוטומטי"
+    ]
+  },
+  {
+    "id": "make-8144412",
+    "name": "סירוב אשראי – חיפה",
+    "category": "billing",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "Arbox",
+      "ManyChat"
+    ],
+    "description": "כשסליקת אשראי של לקוח בסניף חיפה נדחית, האוטומציה שולחת אליו אוטומטית הודעה בוואטסאפ שמבקשת להסדיר את התשלום. כך לא מפספסים חיובים שנתקעו.",
+    "trigger": "סליקת אשראי של לקוח בחיפה נדחתה.",
+    "steps": [
+      "מקבלת מארבוקס התראה על סירוב אשראי בחיפה",
+      "מזהה את הלקוח שהחיוב שלו נדחה",
+      "שולחת ללקוח הודעה אוטומטית להסדרת התשלום"
+    ]
+  },
+  {
+    "id": "make-8144409",
+    "name": "סירוב אשראי – נוף הגליל",
+    "category": "billing",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "Arbox",
+      "ManyChat"
+    ],
+    "description": "כשסליקת אשראי של לקוח בסניף נוף הגליל נדחית, האוטומציה שולחת אליו אוטומטית הודעה בוואטסאפ שמבקשת להסדיר את התשלום. כך לא מפספסים חיובים שנתקעו.",
+    "trigger": "סליקת אשראי של לקוח בנוף הגליל נדחתה.",
+    "steps": [
+      "מקבלת מארבוקס התראה על סירוב אשראי בנוף הגליל",
+      "מזהה את הלקוח שהחיוב שלו נדחה",
+      "שולחת ללקוח הודעה אוטומטית להסדרת התשלום"
+    ]
+  },
+  {
+    "id": "make-9154302",
+    "name": "10 ימי חוסר פעילות ללקוחה - חיפה",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "מזהה לקוחות מסניף חיפה שלא הגיעו לאימון כבר 10 ימים ושולח להן הודעה אישית וחמה בוואטסאפ, כדי לעודד אותן לחזור לשגרת האימונים ולהציע לתאם אימון.",
+    "trigger": "רץ אוטומטית מדי יום בצהריים.",
+    "steps": [
+      "שולף מארבוקס את רשימת הלקוחות ומצב הפעילות שלהן",
+      "מסנן ומשאיר רק לקוחות שלא הגיעו בדיוק 10 ימים ואין להן אימון עתידי מתוכנן",
+      "מאתר את הלקוחה במערכת ההודעות (או יוצר עבורה כרטיס חדש) לפי מספר הטלפון",
+      "שולח לה הודעת התעניינות וחזרה לאימון בוואטסאפ",
+      "מתעד את ההודעה שנשלחה בלוח המעקב במאנדיי תחת סניף חיפה"
+    ]
+  },
+  {
+    "id": "make-9154340",
+    "name": "10 ימי חוסר פעילות ללקוחה - נוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "מזהה לקוחות מסניף נוף הגליל שלא הגיעו לאימון כבר 10 ימים ושולח להן הודעה אישית וחמה בוואטסאפ, כדי לעודד אותן לחזור לשגרת האימונים ולהציע לתאם אימון.",
+    "trigger": "רץ אוטומטית מדי יום בצהריים.",
+    "steps": [
+      "שולף מארבוקס את רשימת הלקוחות ומצב הפעילות שלהן",
+      "מסנן ומשאיר רק לקוחות שלא הגיעו בדיוק 10 ימים ואין להן אימון עתידי מתוכנן",
+      "מאתר את הלקוחה במערכת ההודעות (או יוצר עבורה כרטיס חדש) לפי מספר הטלפון",
+      "שולח לה הודעת התעניינות וחזרה לאימון בוואטסאפ",
+      "מתעד את ההודעה שנשלחה בלוח המעקב במאנדיי תחת סניף נוף הגליל"
+    ]
+  },
+  {
+    "id": "make-8910923",
+    "name": "אימון ניסיון - אישור הגעה - חיפה",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "יום לפני אימון ניסיון בסניף חיפה שולח ללקוחה תזכורת ואישור הגעה בוואטסאפ, כולל שעת האימון, מה להביא וסרטון עם הוראות הגעה לסטודיו - כדי להגדיל את הסיכוי שתגיע.",
+    "trigger": "רץ אוטומטית מדי יום בצהריים ובודק את אימוני המחר.",
+    "steps": [
+      "שולף מארבוקס את מערכת האימונים של יום המחר",
+      "עובר על הנרשמות ומשאיר רק את מי שנרשמה לאימון ניסיון",
+      "מאתר את הלקוחה במערכת ההודעות ומעדכן את פרטי האימון שלה (שעה, סוג ומיקום)",
+      "שולח לה בוואטסאפ תזכורת עם שעת האימון, מה להביא וסרטון הוראות הגעה לכתובת אלנבי 117",
+      "מתעד את ההודעה שנשלחה בלוח המעקב תחת סניף חיפה"
+    ]
+  },
+  {
+    "id": "make-9153855",
+    "name": "אימון ניסיון - אישור הגעה - נוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "יום לפני אימון ניסיון בסניף נוף הגליל שולח ללקוחה תזכורת ואישור הגעה בוואטסאפ, כולל שעת האימון, מה להביא וסרטון עם הוראות הגעה לסטודיו - כדי להגדיל את הסיכוי שתגיע.",
+    "trigger": "רץ אוטומטית מדי יום בצהריים ובודק את אימוני המחר.",
+    "steps": [
+      "שולף מארבוקס את מערכת האימונים של יום המחר",
+      "עובר על הנרשמות ומשאיר רק את מי שנרשמה לאימון ניסיון",
+      "מאתר את הלקוחה במערכת ההודעות ומעדכן את פרטי האימון שלה (שעה, סוג ומיקום)",
+      "שולח לה בוואטסאפ תזכורת עם שעת האימון, מה להביא וסרטון הוראות הגעה לכתובת העבודה 3, נוף הגליל",
+      "מתעד את ההודעה שנשלחה בלוח המעקב תחת סניף נוף הגליל"
+    ]
+  },
+  {
+    "id": "make-9153929",
+    "name": "ביטול אימון ניסיון כשלקוחה מציינת שלא תגיע",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "ManyChat",
+      "וואטסאפ"
+    ],
+    "description": "כשלקוחה משיבה בהודעה שהיא לא מגיעה לאימון הניסיון, מבטל אוטומטית את רישום אימון הניסיון שלה בארבוקס, כדי לפנות את המקום למי שכן מעוניינת.",
+    "trigger": "מופעל מיד כשמתקבלת מהלקוחה תשובה שהיא לא מגיעה.",
+    "steps": [
+      "מקבל את פרטי הלקוחה ואת מזהה האימון שאליו נרשמה",
+      "מבטל בארבוקס את רישום אימון הניסיון שלה"
+    ]
+  },
+  {
+    "id": "make-9138689",
+    "name": "הודעה אחרי אימון ראשון - חיפה ונוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "וואטסאפ",
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "שולח ללקוחה הודעת מעקב חמה יום אחרי האימון הראשון שלה, כדי לשמוע איך היה ולחזק את הקשר האישי. משרת את שני הסניפים.",
+    "trigger": "רץ אוטומטית כל רבע שעה ובודק אילו הודעות הגיע מועד שליחתן.",
+    "steps": [
+      "בודק ברשימת ההמתנה אילו לקוחות הגיע הזמן לשלוח להן הודעה",
+      "מסדר את מספר הטלפון ומאתר את הלקוחה במערכת ההודעות (או יוצר עבורה כרטיס חדש)",
+      "שולח לה בוואטסאפ הודעה ששואלת איך היה האימון הראשון",
+      "מסיר את הלקוחה מרשימת ההמתנה כדי שלא תקבל הודעה כפולה",
+      "מתעד את ההודעה שנשלחה בלוח המעקב לפי הסניף המתאים"
+    ]
+  },
+  {
+    "id": "make-9149854",
+    "name": "הודעה שלושה שבועות אחרי - חיפה ונוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "וואטסאפ",
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "שלושה שבועות אחרי תחילת האימונים שולח ללקוחה הודעה חמה שמזמינה אותה להביא חברה לאימון ניסיון במתנה, ואם החברה נרשמת - הלקוחה מקבלת שובר לארוחת בוקר. משרת את שני הסניפים.",
+    "trigger": "רץ אוטומטית כל רבע שעה ובודק אילו הודעות הגיע מועד שליחתן.",
+    "steps": [
+      "בודק ברשימת ההמתנה אילו לקוחות הגיע הזמן לשלוח להן הודעה",
+      "מסדר את מספר הטלפון ומאתר את הלקוחה במערכת ההודעות (או יוצר עבורה כרטיס חדש)",
+      "שולח לה בוואטסאפ הזמנה להביא חברה לאימון ניסיון במתנה, עם שובר לארוחת בוקר כתמריץ",
+      "מסיר את הלקוחה מרשימת ההמתנה כדי שלא תקבל הודעה כפולה",
+      "מתעד את ההודעה שנשלחה בלוח המעקב לפי הסניף המתאים"
+    ]
+  },
+  {
+    "id": "make-9127253",
+    "name": "יום הולדת - חיפה",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "שולח ברכת יום הולדת חמה ואישית בוואטסאפ ללקוחות סניף חיפה שחוגגות יום הולדת באותו יום, כדי לשמור על קשר קרוב ולגרום להן להרגיש מיוחדות.",
+    "trigger": "רץ אוטומטית מדי יום בצהריים.",
+    "steps": [
+      "שולף מארבוקס את רשימת הלקוחות ופרטי הלידה שלהן",
+      "מסנן ומשאיר רק את מי שחוגגת יום הולדת היום",
+      "מאתר את הלקוחה במערכת ההודעות (או יוצר עבורה כרטיס חדש)",
+      "שולח לה ברכת יום הולדת חמה בוואטסאפ",
+      "מתעד את ההודעה שנשלחה בלוח המעקב תחת סניף חיפה"
+    ]
+  },
+  {
+    "id": "make-9127376",
+    "name": "יום הולדת - נוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "שולח ברכת יום הולדת חמה ואישית בוואטסאפ ללקוחות סניף נוף הגליל שחוגגות יום הולדת באותו יום, כדי לשמור על קשר קרוב ולגרום להן להרגיש מיוחדות.",
+    "trigger": "רץ אוטומטית מדי יום בצהריים.",
+    "steps": [
+      "שולף מארבוקס את רשימת הלקוחות ופרטי הלידה שלהן",
+      "מסנן ומשאיר רק את מי שחוגגת יום הולדת היום",
+      "מאתר את הלקוחה במערכת ההודעות (או יוצר עבורה כרטיס חדש)",
+      "שולח לה ברכת יום הולדת חמה בוואטסאפ",
+      "מתעד את ההודעה שנשלחה בלוח המעקב תחת סניף נוף הגליל"
+    ]
+  },
+  {
+    "id": "make-9126225",
+    "name": "כל הכבוד על ההתמדה - אחרי 10 אימונים - חיפה",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "monday.com"
+    ],
+    "description": "מזהה לקוחות בסניף חיפה שהשלימו 10 אימונים ושולח להן הודעת וואטסאפ חמה של מחמאה על ההתמדה. כך כל לקוחה מרגישה שרואים ומעריכים אותה, וזה מחזק את הקשר והמוטיבציה להמשיך.",
+    "trigger": "רץ אוטומטית כל שעה ובודק ב-Arbox מי הגיעה בדיוק ל-10 אימונים.",
+    "steps": [
+      "בודק ב-Arbox אילו לקוחות הגיעו ל-10 אימונים",
+      "שולף את פרטי הלקוחה ומוודא שיש מספר טלפון",
+      "מאתר את הלקוחה בוואטסאפ (ManyChat), ואם אינה קיימת - יוצר לה כרטיס",
+      "שולח הודעת מחמאה אישית על ההתמדה",
+      "מתעד את ההודעה שנשלחה בלוח המעקב במאנדיי"
+    ]
+  },
+  {
+    "id": "make-9126226",
+    "name": "כל הכבוד על ההתמדה - אחרי 10 אימונים - נוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "monday.com"
+    ],
+    "description": "מזהה לקוחות בסניף נוף הגליל שהשלימו 10 אימונים ושולח להן הודעת וואטסאפ חמה של מחמאה על ההתמדה. כך כל לקוחה מרגישה שרואים ומעריכים אותה, וזה מחזק את הקשר והמוטיבציה להמשיך.",
+    "trigger": "רץ אוטומטית כל שעה ובודק ב-Arbox מי הגיעה בדיוק ל-10 אימונים.",
+    "steps": [
+      "בודק ב-Arbox אילו לקוחות הגיעו ל-10 אימונים",
+      "שולף את פרטי הלקוחה ומוודא שיש מספר טלפון",
+      "מאתר את הלקוחה בוואטסאפ (ManyChat), ואם אינה קיימת - יוצר לה כרטיס",
+      "שולח הודעת מחמאה אישית על ההתמדה",
+      "מתעד את ההודעה שנשלחה בלוח המעקב במאנדיי"
+    ]
+  },
+  {
+    "id": "make-8351961",
+    "name": "מעקב רכישות חדשות - חיפה",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "monday.com",
+      "וואטסאפ",
+      "ManyChat"
+    ],
+    "description": "עם כל רכישת מנוי או סדנה חדשה בסניף חיפה, מתעד את הלקוחה בלוח המעקב ושולח לה הודעת ברוכה הבאה חמה עם סרטון טיפים למתאמנת מתחילה, כדי לפתוח את הקשר בצורה הכי טובה.",
+    "trigger": "מופעל אוטומטית בכל פעם שמתבצעת רכישה חדשה של מנוי או סדנה בארבוקס.",
+    "steps": [
+      "מקבל התראה על הרכישה החדשה ושולף את פרטי הלקוחה מארבוקס",
+      "בודק בלוח המעקב במאנדיי אם הלקוחה כבר קיימת, ואם לא - מוסיף אותה",
+      "מתעד את פרטי המנוי או הסדנה שנרכשו בלוח",
+      "מאתר את הלקוחה במערכת ההודעות (או יוצר עבורה כרטיס חדש)",
+      "שולח לה בוואטסאפ הודעת ברוכה הבאה עם סרטון טיפים למתאמנת מתחילה",
+      "מתעד את ההודעה שנשלחה בלוח המעקב תחת סניף חיפה"
+    ]
+  },
+  {
+    "id": "make-8323421",
+    "name": "מעקב רכישות חדשות - נוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "monday.com",
+      "וואטסאפ",
+      "ManyChat"
+    ],
+    "description": "עם כל רכישת מנוי או סדנה חדשה בסניף נוף הגליל, מתעד את הלקוחה בלוח המעקב ושולח לה הודעת ברוכה הבאה חמה עם סרטון טיפים למתאמנת מתחילה, כדי לפתוח את הקשר בצורה הכי טובה.",
+    "trigger": "מופעל אוטומטית בכל פעם שמתבצעת רכישה חדשה של מנוי או סדנה בארבוקס.",
+    "steps": [
+      "מקבל התראה על הרכישה החדשה ושולף את פרטי הלקוחה מארבוקס",
+      "בודק בלוח המעקב במאנדיי אם הלקוחה כבר קיימת, ואם לא - מוסיף אותה",
+      "מתעד את פרטי המנוי או הסדנה שנרכשו בלוח",
+      "מאתר את הלקוחה במערכת ההודעות (או יוצר עבורה כרטיס חדש)",
+      "שולח לה בוואטסאפ הודעת ברוכה הבאה עם סרטון טיפים למתאמנת מתחילה",
+      "מתעד את ההודעה שנשלחה בלוח המעקב תחת סניף נוף הגליל"
+    ]
+  },
+  {
+    "id": "make-9126229",
+    "name": "סירוב אשראי - חיפה",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "monday.com"
+    ],
+    "description": "כשתשלום של לקוחה בחיפה נדחה, נשלחת אליה מיד הודעת וואטסאפ עדינה עם לינק לעדכון פרטי התשלום. כך גובים בזמן, בלי מבוכה, ובלי שהצוות צריך לרדוף אחרי חובות.",
+    "trigger": "מופעל מיד כש-Arbox מדווח על תשלום שנדחה בסניף חיפה.",
+    "steps": [
+      "מקבל מ-Arbox התראה על סירוב אשראי",
+      "בודק שיש מספר טלפון ושמדובר באחד הניסיונות הראשונים",
+      "מאתר את הלקוחה בוואטסאפ ומעדכן אצלה את לינק התשלום",
+      "שולח הודעה עדינה עם קישור לעדכון פרטי הכרטיס",
+      "מתעד את ההודעה שנשלחה בלוח המעקב במאנדיי"
+    ]
+  },
+  {
+    "id": "make-9126230",
+    "name": "סירוב אשראי - נוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ",
+      "monday.com"
+    ],
+    "description": "כשתשלום של לקוחה בנוף הגליל נדחה, נשלחת אליה מיד הודעת וואטסאפ עדינה עם לינק לעדכון פרטי התשלום. כך גובים בזמן, בלי מבוכה, ובלי שהצוות צריך לרדוף אחרי חובות.",
+    "trigger": "מופעל מיד כש-Arbox מדווח על תשלום שנדחה בסניף נוף הגליל.",
+    "steps": [
+      "מקבל מ-Arbox התראה על סירוב אשראי",
+      "בודק שיש מספר טלפון ושמדובר באחד הניסיונות הראשונים",
+      "מאתר את הלקוחה בוואטסאפ ומעדכן אצלה את לינק התשלום",
+      "שולח הודעה עדינה עם קישור לעדכון פרטי הכרטיס",
+      "מתעד את ההודעה שנשלחה בלוח המעקב במאנדיי"
+    ]
+  },
+  {
+    "id": "make-9156035",
+    "name": "רוצה לקבוע אימון ניסיון - הכנסה למאנדיי",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "וואטסאפ",
+      "monday.com"
+    ],
+    "description": "כשמתעניינת מבקשת בוואטסאפ לקבוע אימון ניסיון, הפרטים שלה נכנסים אוטומטית ללוח הלידים במאנדיי יחד עם השעה שנוחה לה לשיחה. כך אף פנייה לא הולכת לאיבוד והצוות יכול לחזור אליה מהר.",
+    "trigger": "מופעל מיד כשמתעניינת מבקשת בוואטסאפ לקבוע אימון ניסיון.",
+    "steps": [
+      "מקבל את פרטי המתעניינת מבוט הוואטסאפ",
+      "יוצר כרטיס ליד חדש בלוח הלידים במאנדיי",
+      "ממלא את מספר הטלפון, סימון 'אימון ניסיון' והשעה הנוחה לשיחה"
+    ]
+  },
+  {
+    "id": "make-9127616",
+    "name": "תזכורת לאימון - חיפה",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ"
+    ],
+    "description": "שולח ללקוחות בחיפה תזכורת וואטסאפ לפני האימון הקרוב שלהן, לפי היומן ב-Arbox. כך פחות לקוחות שוכחות להגיע, וניצול המקומות באימונים משתפר.",
+    "trigger": "רץ אוטומטית כל שעה ובודק ביומן Arbox של חיפה אילו אימונים מתקרבים.",
+    "steps": [
+      "שולף מ-Arbox את יומן האימונים ואת הנרשמות",
+      "מסנן את הלקוחות שהאימון שלהן מתקרב ומגיע זמן התזכורת",
+      "מאתר כל לקוחה בוואטסאפ, ואם אינה קיימת - יוצר לה כרטיס",
+      "שולח הודעת תזכורת אישית על האימון הקרוב"
+    ]
+  },
+  {
+    "id": "make-9138479",
+    "name": "תזכורת לאימון - נוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "וואטסאפ"
+    ],
+    "description": "שולח ללקוחות בנוף הגליל תזכורת וואטסאפ לפני האימון הקרוב שלהן, לפי היומן ב-Arbox. כך פחות לקוחות שוכחות להגיע, וניצול המקומות באימונים משתפר.",
+    "trigger": "רץ אוטומטית כל שעה ובודק ביומן Arbox של נוף הגליל אילו אימונים מתקרבים.",
+    "steps": [
+      "שולף מ-Arbox את יומן האימונים ואת הנרשמות",
+      "מסנן את הלקוחות שהאימון שלהן מתקרב ומגיע זמן התזכורת",
+      "מאתר כל לקוחה בוואטסאפ, ואם אינה קיימת - יוצר לה כרטיס",
+      "שולח הודעת תזכורת אישית על האימון הקרוב"
+    ]
+  },
+  {
+    "id": "make-9138626",
+    "name": "תזמון הודעות אחרי אימון ראשון - חיפה",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "מאגר נתונים של Make"
+    ],
+    "description": "מזהה לקוחות בחיפה שסיימו את האימון הראשון שלהן ומתזמן עבורן הודעות המשך - אחת קצת אחרי האימון ואחת כשלושה שבועות אחר כך. כך כל לקוחה חדשה מקבלת ליווי אישי בתחילת הדרך.",
+    "trigger": "רץ אוטומטית כל רבע שעה ומזהה ב-Arbox מי סיימה זה עתה אימון ראשון.",
+    "steps": [
+      "בודק ב-Arbox אילו לקוחות ביצעו את האימון הראשון",
+      "שולף את פרטי הלקוחה ומוודא שיש מספר טלפון",
+      "מחשב מתי לשלוח כל הודעת המשך (מעט אחרי האימון וכשלושה שבועות אחריו)",
+      "שומר את ההודעות המתוזמנות במאגר הנתונים לשליחה בהמשך"
+    ]
+  },
+  {
+    "id": "make-9138717",
+    "name": "תזמון הודעות אחרי אימון ראשון - נוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "Arbox",
+      "מאגר נתונים של Make"
+    ],
+    "description": "מזהה לקוחות בנוף הגליל שסיימו את האימון הראשון שלהן ומתזמן עבורן הודעות המשך - אחת קצת אחרי האימון ואחת כשלושה שבועות אחר כך. כך כל לקוחה חדשה מקבלת ליווי אישי בתחילת הדרך.",
+    "trigger": "רץ אוטומטית כל רבע שעה ומזהה ב-Arbox מי סיימה זה עתה אימון ראשון.",
+    "steps": [
+      "בודק ב-Arbox אילו לקוחות ביצעו את האימון הראשון",
+      "שולף את פרטי הלקוחה ומוודא שיש מספר טלפון",
+      "מחשב מתי לשלוח כל הודעת המשך (מעט אחרי האימון וכשלושה שבועות אחריו)",
+      "שומר את ההודעות המתוזמנות במאגר הנתונים לשליחה בהמשך"
+    ]
+  },
+  {
+    "id": "make-9126105",
+    "name": "לקוחה חדשה - מיד עם עדכון המנוי - חיפה",
+    "category": "arbox",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "Arbox",
+      "וואטסאפ"
+    ],
+    "description": "כשנפתח מנוי חדש בחיפה, נשלחת ללקוחה הודעת וואטסאפ מקבלת פנים אישית. כך כל לקוחה חדשה מרגישה שמחכים לה כבר מהרגע הראשון.",
+    "trigger": "רץ אוטומטית כל שעה ומזהה ב-Arbox מנויים חדשים שנפתחו היום בחיפה.",
+    "steps": [
+      "בודק ב-Arbox אילו מנויים חדשים נפתחו היום",
+      "מאתר את הלקוחה בוואטסאפ ומעדכן את שמה הפרטי",
+      "שולח לה הודעת ברוכה הבאה אישית"
+    ]
+  },
+  {
+    "id": "make-9126106",
+    "name": "לקוחה חדשה - מיד עם עדכון המנוי - נוף הגליל",
+    "category": "arbox",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "Arbox",
+      "וואטסאפ"
+    ],
+    "description": "כשנפתח מנוי חדש בנוף הגליל, נשלחת ללקוחה הודעת וואטסאפ מקבלת פנים אישית. כך כל לקוחה חדשה מרגישה שמחכים לה כבר מהרגע הראשון.",
+    "trigger": "רץ אוטומטית כל שעה ומזהה ב-Arbox מנויים חדשים שנפתחו היום בנוף הגליל.",
+    "steps": [
+      "בודק ב-Arbox אילו מנויים חדשים נפתחו היום",
+      "מאתר את הלקוחה בוואטסאפ ומעדכן את שמה הפרטי",
+      "שולח לה הודעת ברוכה הבאה אישית"
+    ]
+  },
+  {
+    "id": "make-8740172",
+    "name": "פיצול דיוור",
+    "category": "broadcast",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "monday.com",
+      "ManyChat"
+    ],
+    "description": "כשרוצים לשלוח דיוור, האוטומציה עוברת על מאגר אנשי הקשר ומחלקת כל לקוח לרשימה הנכונה לפי שיוך - אונליין, חיפה או נוף הגליל. כך כל קהל מקבל בדיוק את הדיוור שמיועד לו.",
+    "trigger": "מסמנים במאנדיי אנשי קשר לפיצול והכנה לדיוור.",
+    "steps": [
+      "זיהוי אנשי הקשר שסומנו לפיצול במאנדיי",
+      "סידור וניקוי מספר הטלפון של כל לקוח",
+      "בדיקה לאיזה מאגר שייך הלקוח (אונליין / חיפה / נוף הגליל)",
+      "העברת הלקוח לתהליך הפיצול המתאים לפי הסניף",
+      "עדכון סטטוס הלקוח במאנדיי"
+    ]
+  },
+  {
+    "id": "make-8865912",
+    "name": "פיצול דיוור - מאגר אונליין",
+    "category": "broadcast",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "מכינה את לקוחות האונליין לדיוור: מסמנת כל לקוח בבוט כשייך לרשימת האונליין ומעדכנת את הכרטיס שלו במאנדיי. כך הדיוור יוצא בדיוק לקהל הנכון.",
+    "trigger": "לקוח ממאגר האונליין מגיע מתהליך פיצול הדיוור.",
+    "steps": [
+      "קבלת פרטי הלקוח מתהליך פיצול הדיוור",
+      "איתור הלקוח בבוט לפי מספר הטלפון",
+      "סימון הלקוח לרשימת דיוור אונליין (אם קיים בבוט)",
+      "עדכון כרטיס הלקוח במאנדיי - סימון הוצאת דיוור ותאריכי דיוור ואיפוס"
+    ]
+  },
+  {
+    "id": "make-8865943",
+    "name": "פיצול דיוור - מאגר חיפה",
+    "category": "broadcast",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "מכינה את לקוחות סניף חיפה לדיוור: מסמנת כל לקוח בבוט כשייך לרשימת חיפה ומעדכנת את הכרטיס שלו במאנדיי. כך הדיוור יוצא בדיוק לקהל של חיפה.",
+    "trigger": "לקוח ממאגר חיפה מגיע מתהליך פיצול הדיוור.",
+    "steps": [
+      "קבלת פרטי הלקוח מתהליך פיצול הדיוור",
+      "איתור הלקוח בבוט לפי מספר הטלפון",
+      "סימון הלקוח לרשימת דיוור חיפה (אם קיים בבוט)",
+      "עדכון כרטיס הלקוח במאנדיי - סימון הוצאת דיוור ותאריכי דיוור ואיפוס"
+    ]
+  },
+  {
+    "id": "make-8865937",
+    "name": "פיצול דיוור - מאגר נוף הגליל",
+    "category": "broadcast",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com"
+    ],
+    "description": "מכינה את לקוחות סניף נוף הגליל לדיוור: מסמנת כל לקוח בבוט כשייך לרשימת נוף הגליל ומעדכנת את הכרטיס שלו במאנדיי. כך הדיוור יוצא בדיוק לקהל של נוף הגליל.",
+    "trigger": "לקוח ממאגר נוף הגליל מגיע מתהליך פיצול הדיוור.",
+    "steps": [
+      "קבלת פרטי הלקוח מתהליך פיצול הדיוור",
+      "איתור הלקוח בבוט לפי מספר הטלפון",
+      "סימון הלקוח לרשימת דיוור נוף הגליל (אם קיים בבוט)",
+      "עדכון כרטיס הלקוח במאנדיי - סימון הוצאת דיוור ותאריכי דיוור ואיפוס"
+    ]
+  },
+  {
+    "id": "make-5460580",
+    "name": "הוספת ליד למאגר לקוחות",
+    "category": "general",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "monday.com",
+      "עיבוד מספרי טלפון"
+    ],
+    "description": "כשנכנס ליד חדש, המערכת מוסיפה אותו אוטומטית למאגר הלקוחות של הסניף המתאים. כך רשימת התפוצה שלך תמיד מעודכנת בלי עבודה ידנית.",
+    "trigger": "נכנס ליד חדש למערכת ניהול הלידים.",
+    "steps": [
+      "המערכת מזהה שנוצר ליד חדש ושולפת את הפרטים שלו.",
+      "לפי הסניף של הליד (חיפה, נוף הגליל או אונליין) בוחרת את המאגר הנכון.",
+      "בודקת לפי מספר הטלפון אם הלקוח כבר קיים במאגר.",
+      "אם הוא עדיין לא קיים, מוסיפה אותו לרשימת התפוצה של המאגר."
+    ]
+  },
+  {
+    "id": "make-5575276",
+    "name": "חיבור מאניצ׳אט לאינסטגרם ולפייסבוק",
+    "category": "general",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "ManyChat",
+      "monday.com",
+      "עיבוד מספרי טלפון"
+    ],
+    "description": "מחברת בין הבוט של מאניצ׳אט באינסטגרם ובפייסבוק למערכת הלידים. כל פנייה שמגיעה מהבוט נרשמת אוטומטית במקום הנכון.",
+    "trigger": "מגיעה פנייה חדשה מהבוט של מאניצ׳אט.",
+    "steps": [
+      "המערכת מקבלת את פרטי הפונה מהבוט ומסדרת את מספר הטלפון.",
+      "בודקת אם מדובר בפנייה רגילה או בהרשמה לוובינר.",
+      "פנייה רגילה נרשמת בלוח ניהול הלידים עם מקור ההגעה (אינסטגרם או פייסבוק).",
+      "נרשם לוובינר נכנס ללוח נרשמי הוובינר לפי תאריך המפגש.",
+      "המערכת גם רושמת ומתייגת את הנרשם במאניצ׳אט לצורך המשך תקשורת."
+    ]
+  },
+  {
+    "id": "make-5422120",
+    "name": "טיפול בתגובות להודעות תפוצה",
+    "category": "general",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "monday.com",
+      "וואטסאפ",
+      "עיבוד מספרי טלפון"
+    ],
+    "description": "מטפלת אוטומטית בתגובות של לקוחות להודעות התפוצה. מי שמתעניין נרשם כליד חדש והצוות מקבל התראה, ומי שלא מעוניין מוסר מהתפוצה.",
+    "trigger": "מתקבלת תגובה של לקוח להודעת תפוצה.",
+    "steps": [
+      "המערכת מזהה מאיזה סניף הגיעה התגובה ומה עמדת הלקוח.",
+      "אם הלקוח מעוניין, נפתח עבורו ליד חדש בלוח ניהול הלידים.",
+      "הצוות מקבל התראה בקבוצת הוואטסאפ על הליד החדש.",
+      "אם הלקוח לא מעוניין, המערכת מסירה אותו מרשימת התפוצה של הסניף.",
+      "תגובות מוובינר נרשמות בנפרד לפי סוג ההמשך שנבחר."
+    ]
+  },
+  {
+    "id": "make-5461143",
+    "name": "מחיקת לקוח שנרשם מרשימת התפוצה",
+    "category": "general",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "monday.com"
+    ],
+    "description": "כשלקוח נרשם, המערכת מוציאה אותו אוטומטית מרשימת התפוצה של הסניף שלו. כך לקוחות רשומים לא מקבלים יותר הודעות שיווק מיותרות.",
+    "trigger": "ליד עובר לסטטוס \"נרשם\".",
+    "steps": [
+      "המערכת מזהה שהליד עבר לסטטוס נרשם ושולפת את פרטיו.",
+      "לפי הסניף (חיפה, נוף הגליל או אונליין) פונה למאגר המתאים.",
+      "מאתרת את הלקוח במאגר לפי מספר הטלפון.",
+      "מוחקת אותו מרשימת התפוצה כדי שלא יקבל עוד הודעות שיווק."
+    ]
+  },
+  {
+    "id": "make-5088802",
+    "name": "פתיחת קבוצה חדשה לוובינר",
+    "category": "general",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "monday.com"
+    ],
+    "description": "כשמעלים וובינר חדש לסטטוס פעיל, המערכת פותחת עבורו קבוצה מסודרת בלוח הוובינרים. כך כל וובינר מקבל מקום משלו לניהול הנרשמים.",
+    "trigger": "וובינר מועבר לסטטוס \"וובינר בהקמה\".",
+    "steps": [
+      "המערכת מזהה שנפתח וובינר חדש.",
+      "יוצרת קבוצה חדשה בלוח הוובינרים על שם המפגש.",
+      "הקבוצה מוכנה לקליטת הנרשמים לאותו וובינר."
+    ]
+  },
+  {
+    "id": "make-5421711",
+    "name": "שליחת הודעות תפוצה",
+    "category": "general",
+    "platform": "make",
+    "status": "active",
+    "apps": [
+      "monday.com",
+      "ManyChat",
+      "וואטסאפ",
+      "עיבוד מספרי טלפון"
+    ],
+    "description": "בלחיצת כפתור שולחת הודעת תפוצה בוואטסאפ לקבוצת לקוחות מהמאגר של הסניף הנבחר. את מחליטה כמה אנשים לכלול בכל שליחה.",
+    "trigger": "מעדכנים בלוח הבקרה סטטוס \"שליחת הודעה\" לסניף מסוים.",
+    "steps": [
+      "המערכת קוראת לאיזה סניף לשלוח וכמה אנשים לכלול בשליחה.",
+      "שולפת את מספרי הטלפון מרשימת התפוצה של אותו סניף.",
+      "מוסיפה כל אדם כמנוי במאניצ׳אט ושולחת לו את הודעת הוואטסאפ.",
+      "מעבירה כל מי שקיבל הודעה לקבוצת \"נשלחה הודעת תפוצה\".",
+      "מסירה מהמאגר מספרים שלא ניתן היה לשלוח אליהם."
+    ]
+  },
+  {
+    "id": "make-8421670",
+    "name": "העלאת מאגר לקוחות אונליין למאניצ׳אט עם תגית",
+    "category": "general",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "Google Sheets",
+      "ManyChat",
+      "עיבוד מספרי טלפון"
+    ],
+    "description": "מעלה בבת אחת את כל אנשי הקשר ממאגר הלקוחות האונליין למאניצ׳אט ומתייגת אותם. כך ניתן לפנות אליהם בקלות בהמשך.",
+    "trigger": "רץ אוטומטית ועובר על רשימת אנשי הקשר בגיליון \"מאגר אונליין\".",
+    "steps": [
+      "המערכת קוראת את אנשי הקשר מגיליון מאגר האונליין ומסדרת את מספרי הטלפון.",
+      "יוצרת עבור כל אחד מנוי במאניצ׳אט.",
+      "מוסיפה לו את התגית \"מאגר אונליין\".",
+      "אם האדם כבר קיים במאניצ׳אט, מאתרת אותו ומתייגת גם אותו."
+    ]
+  },
+  {
+    "id": "make-9396553",
+    "name": "עדכון קישור לשיחה במאניצ׳אט בלוח המעקב",
+    "category": "general",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "monday.com",
+      "ManyChat"
+    ],
+    "description": "משלימה באופן יזום את הקישור לשיחה במאניצ׳אט בשורות שחסר בהן. כך אפשר לגשת מלוח המעקב ישירות לשיחה עם הלקוח.",
+    "trigger": "רץ אוטומטית ועובר על לוח מעקב ההודעות.",
+    "steps": [
+      "המערכת עוברת על השורות בלוח מעקב ההודעות.",
+      "מדלגת על שורות שכבר יש בהן קישור לשיחה.",
+      "מאתרת במאניצ׳אט את הלקוח לפי מספר הטלפון.",
+      "משלימה את הקישור לשיחה בשורה המתאימה בלוח."
+    ]
+  },
+  {
+    "id": "make-3406244",
+    "name": "קליטת לידים מפייסבוק",
+    "category": "general",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "פייסבוק",
+      "Google Sheets",
+      "monday.com",
+      "עיבוד מספרי טלפון"
+    ],
+    "description": "קולטת אוטומטית לידים מטופסי הפרסום בפייסבוק ומכניסה אותם לגיליון ולמערכת ניהול הלידים. כך אף פנייה מפרסום לא הולכת לאיבוד.",
+    "trigger": "מתקבל ליד חדש מטופס פרסום בפייסבוק.",
+    "steps": [
+      "המערכת מקבלת את פרטי הליד מפייסבוק ומסדרת את מספר הטלפון.",
+      "רושמת את הליד בגיליון הלידים לתיעוד.",
+      "מזהה לפי שם הקמפיין לאיזה סניף שייך הליד.",
+      "פותחת ליד חדש בלוח ניהול הלידים עם מקור ההגעה והסניף המתאים."
+    ]
+  },
+  {
+    "id": "make-6194177",
+    "name": "קליטת נרשמי וובינר מפייסבוק",
+    "category": "general",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "פייסבוק",
+      "monday.com",
+      "ManyChat",
+      "עיבוד מספרי טלפון"
+    ],
+    "description": "קולטת נרשמים לוובינר מטופסי הפרסום בפייסבוק ומכניסה אותם ללוח הנרשמים ולמאניצ׳אט. כך כל נרשם מוכן לקבל את הודעות הוובינר.",
+    "trigger": "מתקבלת הרשמה לוובינר מטופס פרסום בפייסבוק.",
+    "steps": [
+      "המערכת מקבלת את פרטי הנרשם ומסדרת את מספר הטלפון.",
+      "מוסיפה אותו ללוח נרשמי הוובינר לפי תאריך המפגש.",
+      "יוצרת עבורו מנוי במאניצ׳אט.",
+      "מוסיפה לו את התגית \"וובינר\" להמשך התקשורת."
+    ]
+  },
+  {
+    "id": "make-5090187",
+    "name": "שליחת הודעות תזכורת לוובינר",
+    "category": "general",
+    "platform": "make",
+    "status": "inactive",
+    "apps": [
+      "monday.com"
+    ],
+    "description": "נועדה לשלוח לנרשמי הוובינר הודעות תזכורת בתזמונים שונים סביב מועד המפגש. האוטומציה כבויה ומשמשת כבסיס להגדרת התזכורות.",
+    "trigger": "משתנה סטטוס שליחת ההודעה של נרשם בלוח הוובינר.",
+    "steps": [
+      "המערכת מזהה איזו תזכורת נדרשת (למשל שלושה ימים לפני, יום לפני או יום אחרי).",
+      "בוחרת את תוכן ההודעה המתאים לאותו תזמון.",
+      "ממתינה רגע לפני המשך הפעולה."
+    ]
+  }
+];
+
+/* =========================================================================
+   RENDER — לוגיקת הצגה. בדרך כלל אין צורך לגעת בזה.
+   ========================================================================= */
+
+/* ===== monday.com — לוחות הפרויקט (נתונים, לא אוטומציות) ===== */
+const MB_CATEGORIES = [
+  { id:"mb-db",    icon:"🗂️", title:"מאגרים ולקוחות",   desc:"מסדי הנתונים המרכזיים של הלקוחות והמנויים" },
+  { id:"mb-leads", icon:"🎯", title:"לידים",            desc:"לוחות ניהול וקליטת לידים" },
+  { id:"mb-sales", icon:"🛒", title:"הרשמות וסדנאות",   desc:"הרשמות למנויים, סדנאות ומכירות" },
+  { id:"mb-web",   icon:"🎥", title:"וובינרים",         desc:"ניהול וובינרים ורשימות נרשמים" },
+  { id:"mb-ops",   icon:"⚙️", title:"תפעול והודעות",    desc:"מעקב הודעות, הקפאות ושקילות" },
+];
+// BOARDS array is injected below (populated from the monday scan).
+const BOARDS = [
+  {
+    "id": "mb-1973739803",
+    "name": "מאגר אונליין",
+    "category": "mb-db",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 10004,
+    "kindHe": "לוח ציבורי",
+    "description": "מאגר אנשי הקשר של קהל האונליין, המשמש כרשימת תפוצה לשליחת דיוורים והודעות. עבור כל איש קשר נשמר מספר הטלפון ומתועד מתי נשלח אליו הדיוור האחרון.",
+    "groups": [
+      "רשימת תפוצה",
+      "נשלחה הודעת תפוצה"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "מספר טלפון",
+        "type": "טלפון"
+      },
+      {
+        "name": "פריטי משנה",
+        "type": "משימות משנה"
+      },
+      {
+        "name": "הוצאת דיוור",
+        "type": "תיבת סימון"
+      },
+      {
+        "name": "תאריך דיוור אחרון",
+        "type": "תאריך"
+      },
+      {
+        "name": "תאריך איפוס V",
+        "type": "תאריך"
+      }
+    ]
+  },
+  {
+    "id": "mb-1973739785",
+    "name": "מאגר נוף הגליל",
+    "category": "mb-db",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 7376,
+    "kindHe": "לוח ציבורי",
+    "description": "מאגר אנשי הקשר של סניף נוף הגליל, המשמש כרשימת תפוצה לשליחת דיוורים והודעות. עבור כל איש קשר נשמר מספר הטלפון ומתועד מתי נשלח אליו הדיוור האחרון.",
+    "groups": [
+      "רשימת תפוצה",
+      "נשלחה הודעת תפוצה"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "מספר טלפון",
+        "type": "טלפון"
+      },
+      {
+        "name": "פריטי משנה",
+        "type": "משימות משנה"
+      },
+      {
+        "name": "הוצאת דיוור",
+        "type": "תיבת סימון"
+      },
+      {
+        "name": "תאריך דיוור אחרון",
+        "type": "תאריך"
+      },
+      {
+        "name": "תאריך איפוס V",
+        "type": "תאריך"
+      }
+    ]
+  },
+  {
+    "id": "mb-1973739298",
+    "name": "מאגר חיפה",
+    "category": "mb-db",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 4244,
+    "kindHe": "לוח ציבורי",
+    "description": "מאגר אנשי הקשר של סניף חיפה, המשמש כרשימת תפוצה לשליחת דיוורים והודעות. עבור כל איש קשר נשמר מספר הטלפון ומתועד מתי נשלח אליו הדיוור האחרון.",
+    "groups": [
+      "רשימת תפוצה",
+      "נשלחה הודעת תפוצה"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "פריטי משנה",
+        "type": "משימות משנה"
+      },
+      {
+        "name": "מספר טלפון",
+        "type": "טלפון"
+      },
+      {
+        "name": "הוצאת דיוור",
+        "type": "תיבת סימון"
+      },
+      {
+        "name": "תאריך דיוור אחרון",
+        "type": "תאריך"
+      },
+      {
+        "name": "תאריך איפוס V",
+        "type": "תאריך"
+      }
+    ]
+  },
+  {
+    "id": "mb-5086806009",
+    "name": "לקוחות",
+    "category": "mb-db",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 926,
+    "kindHe": "לוח ציבורי",
+    "description": "הלוח המרכזי שבו מנוהלים כל הלקוחות של העסק, כולל פרטי קשר, סניף וסטטוס לקוח, ומחובר להרשמות למנויים, לסדנאות, לשקילות ולהקפאות. זהו הבסיס שמרכז את כל המידע על כל לקוחה במקום אחד.",
+    "groups": [
+      "לקוחות פעילים",
+      "לקוחות עבר"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "סטטוס לקוח",
+        "type": "סטטוס"
+      },
+      {
+        "name": "טלפון נייד",
+        "type": "טלפון"
+      },
+      {
+        "name": "מייל",
+        "type": "אימייל"
+      },
+      {
+        "name": "כתובת",
+        "type": "טקסט"
+      },
+      {
+        "name": "עיר",
+        "type": "טקסט"
+      },
+      {
+        "name": "מין",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מאשר שליחת הודעות",
+        "type": "תיבת סימון"
+      },
+      {
+        "name": "מאשר שליחת מיילים",
+        "type": "תיבת סימון"
+      },
+      {
+        "name": "קישור לארבוקס",
+        "type": "קישור"
+      },
+      {
+        "name": "תאריך תחילת פעילות",
+        "type": "תאריך"
+      },
+      {
+        "name": "הרשמות למנויים",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "נוף הגליל/חיפה",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "מס׳ ימי הקפאה",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "הרשמות לסדנאות",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "אונליין/פופאפ/פרונטלי",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "וואטסאפ 10%",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "שקילות",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "מזהי שקילות",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "מזהי הרשמות למנויים",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "מזהי הרשמות לסדנאות",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "מזהה ארבוקס",
+        "type": "טקסט"
+      },
+      {
+        "name": "קישור להקפאות",
+        "type": "קישור ללוח"
+      }
+    ]
+  },
+  {
+    "id": "mb-5085587461",
+    "name": "מנויים",
+    "category": "mb-db",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 10,
+    "kindHe": "לוח ציבורי",
+    "description": "קטלוג סוגי המנויים שהעסק מציע, כולל שם המנוי, מחיר, הסבר, סניף וקישור לדף הסליקה. מכאן נשאבים פרטי המנוי אל הרשמות הלקוחות.",
+    "groups": [
+      "מנויים"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "סטטוס",
+        "type": "סטטוס"
+      },
+      {
+        "name": "חיפה/נוף הגליל",
+        "type": "סטטוס"
+      },
+      {
+        "name": "קישור לדף סליקה",
+        "type": "קישור"
+      },
+      {
+        "name": "מחיר",
+        "type": "מספר"
+      },
+      {
+        "name": "הסבר על המנוי",
+        "type": "טקסט"
+      },
+      {
+        "name": "שם מנוי",
+        "type": "טקסט"
+      },
+      {
+        "name": "הרשמות למנויים",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "יומן יצירה",
+        "type": "יומן יצירה"
+      }
+    ]
+  },
+  {
+    "id": "mb-1945194976",
+    "name": "ניהול לידים",
+    "category": "mb-leads",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 7161,
+    "kindHe": "לוח ציבורי",
+    "description": "הלוח המרכזי לניהול לידים ופניות של מתעניינות חדשות, מרגע השארת הפרטים ועד להרשמה. מנהל את סטטוס הפנייה, מועדי פולואפ, מקור ההגעה, פרטי הקמפיין וסוג המסגרת שמעניינת את הלקוחה.",
+    "groups": [
+      "לידים חדשים",
+      "ממתין לשיחת טלפון",
+      "תקוע",
+      "נרשמו",
+      "לא רלוונטי"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "פריטי משנה",
+        "type": "משימות משנה"
+      },
+      {
+        "name": "מתי השאיר פרטים",
+        "type": "יומן יצירה"
+      },
+      {
+        "name": "קישור לשיחת וואטסאפ",
+        "type": "קישור"
+      },
+      {
+        "name": "שעת שיחה מועדפת",
+        "type": "סטטוס"
+      },
+      {
+        "name": "סטטוס",
+        "type": "סטטוס"
+      },
+      {
+        "name": "תאריך עדכון סטטוס",
+        "type": "תאריך"
+      },
+      {
+        "name": "טלפון",
+        "type": "טלפון"
+      },
+      {
+        "name": "מועד פולואפ",
+        "type": "תאריך"
+      },
+      {
+        "name": "מסגרת",
+        "type": "סטטוס"
+      },
+      {
+        "name": "חודש (אונליין)",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מיקום (פופאפ)",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מיקום (סדנאות/מנויים)",
+        "type": "סטטוס"
+      },
+      {
+        "name": "סדנאות",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "קישור לדף סליקה",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "מקור הגעה",
+        "type": "סטטוס"
+      },
+      {
+        "name": "שם המודעה",
+        "type": "טקסט"
+      },
+      {
+        "name": "שם קמפיין",
+        "type": "טקסט"
+      },
+      {
+        "name": "אימונים/סדנאות/פופאפ",
+        "type": "טקסט"
+      },
+      {
+        "name": "בכמה ק״ג מעוניינת לרדת",
+        "type": "סטטוס"
+      }
+    ]
+  },
+  {
+    "id": "mb-5090085849",
+    "name": "מאגר לידים שהגיעו מפייסבוק ואינסטגרם",
+    "category": "mb-leads",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 3,
+    "kindHe": "לוח ציבורי",
+    "description": "מאגר לידים שהגיעו דרך פייסבוק ואינסטגרם, כולל שם, טלפון, הפלטפורמה שממנה הגיעו ומזהה הצ׳אט. משמש לאיסוף פניות מהפרסום בסושיאל.",
+    "groups": [
+      "לידים"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "פלאפון",
+        "type": "טלפון"
+      },
+      {
+        "name": "פלטפורמה",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מזהה מאניצ׳ט",
+        "type": "טקסט"
+      }
+    ]
+  },
+  {
+    "id": "mb-5085371557",
+    "name": "לידים פלטפורמה - דף נחיתה אונליין",
+    "category": "mb-leads",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 1,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח לניהול לידים שהגיעו מדף הנחיתה של האונליין, מרגע השארת הפרטים ועד להרשמה. עוקב אחר סטטוס הפנייה, מועדי פולואפ ומקור ההגעה.",
+    "groups": [
+      "לידים חדשים",
+      "ממתין לשיחת טלפון",
+      "תקוע",
+      "לא רלוונטי",
+      "נרשמו"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "פריטי משנה",
+        "type": "משימות משנה"
+      },
+      {
+        "name": "מתי השאיר פרטים",
+        "type": "יומן יצירה"
+      },
+      {
+        "name": "סטטוס",
+        "type": "סטטוס"
+      },
+      {
+        "name": "תאריך עדכון סטטוס",
+        "type": "תאריך"
+      },
+      {
+        "name": "טלפון",
+        "type": "טלפון"
+      },
+      {
+        "name": "מועד פולואפ",
+        "type": "תאריך"
+      },
+      {
+        "name": "מסגרת",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מקור הגעה",
+        "type": "סטטוס"
+      },
+      {
+        "name": "שם המודעה",
+        "type": "טקסט"
+      }
+    ]
+  },
+  {
+    "id": "mb-5087261947",
+    "name": "הרשמות למנויים",
+    "category": "mb-sales",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 476,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח המרכז את כל הרשמות הלקוחות למנויים, כולל הלקוח והמנוי המקושרים, הסניף, תאריכי תחילת וסיום המנוי, מקור ההגעה והקפאות. מאפשר מעקב אחר מי מנוי פעיל ומתי המנוי מסתיים.",
+    "groups": [
+      "הרשמות למנויים"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "פעיל/לא פעיל",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מקור הגעה",
+        "type": "סטטוס"
+      },
+      {
+        "name": "חיפה/נוף הגליל",
+        "type": "סטטוס"
+      },
+      {
+        "name": "תאריך תחילת מנוי",
+        "type": "תאריך"
+      },
+      {
+        "name": "תאריך סוף מנוי",
+        "type": "תאריך"
+      },
+      {
+        "name": "תאריך הרשמה",
+        "type": "יומן יצירה"
+      },
+      {
+        "name": "מנוי מקושר",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "לקוח מקושר",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "טלפון לקוח",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "הקפאות",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "מס׳ ימי הקפאה",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "מזהה פריט",
+        "type": "מזהה פריט"
+      },
+      {
+        "name": "תאריך יצירה",
+        "type": "יומן יצירה"
+      },
+      {
+        "name": "תאריך השהייה",
+        "type": "תאריך"
+      },
+      {
+        "name": "תאריך ביטול",
+        "type": "תאריך"
+      }
+    ]
+  },
+  {
+    "id": "mb-5088015789",
+    "name": "הרשמות לסדנאות",
+    "category": "mb-sales",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 156,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח המרכז את כל הרשמות הלקוחות לסדנאות, כולל הלקוח והסדנא המקושרים, סטטוס ההרשמה, סוג הסדנא, מקור ההגעה, המחיר ומועדי הסדנא. מאפשר מעקב אחר מי נרשם לכל סדנא.",
+    "groups": [
+      "הרשמות לסדנאות"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "סטטוס הרשמה",
+        "type": "סטטוס"
+      },
+      {
+        "name": "סוג סדנא",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מקור הגעה",
+        "type": "סטטוס"
+      },
+      {
+        "name": "תאריך ושעת סיום",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "תאריך ושעת התחלה",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "מחיר",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "סדנא מקושרת",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "מעביר הסדנא",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "לקוח מקושר",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "טלפון לקוח",
+        "type": "שדה מראה"
+      },
+      {
+        "name": "מזהה פריט",
+        "type": "מזהה פריט"
+      },
+      {
+        "name": "תאריך הרשמה",
+        "type": "יומן יצירה"
+      },
+      {
+        "name": "מזהה הזמנה",
+        "type": "טקסט"
+      }
+    ]
+  },
+  {
+    "id": "mb-5085504925",
+    "name": "סדנאות",
+    "category": "mb-sales",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 15,
+    "kindHe": "לוח ציבורי",
+    "description": "קטלוג הסדנאות שהעסק מציע, כולל מעביר הסדנא, סוג ומיקום (אונליין/פופ-אפ/פרונטלי), מועדים, מחיר, הסבר וקישור לדף הסליקה. מכאן נשאבים פרטי הסדנא אל הרשמות הלקוחות.",
+    "groups": [
+      "סדנאות"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "מעביר הסדנא",
+        "type": "טקסט"
+      },
+      {
+        "name": "סטטוס",
+        "type": "סטטוס"
+      },
+      {
+        "name": "אונליין/פופ-אפ/פרונטלי",
+        "type": "סטטוס"
+      },
+      {
+        "name": "סוג",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מיקום",
+        "type": "סטטוס"
+      },
+      {
+        "name": "תאריך ושעת התחלה",
+        "type": "תאריך"
+      },
+      {
+        "name": "תאריך ושעת סיום",
+        "type": "תאריך"
+      },
+      {
+        "name": "ימים",
+        "type": "טקסט"
+      },
+      {
+        "name": "שעה",
+        "type": "טקסט"
+      },
+      {
+        "name": "מחיר",
+        "type": "מספר"
+      },
+      {
+        "name": "מחיר הנחה",
+        "type": "טקסט"
+      },
+      {
+        "name": "תאריך סיום הנחה",
+        "type": "תאריך"
+      },
+      {
+        "name": "הסבר על הסדנא",
+        "type": "טקסט"
+      },
+      {
+        "name": "קישור לדף סליקה",
+        "type": "קישור"
+      },
+      {
+        "name": "הרשמות לסדנאות",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "שקילות מקושרות",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "שם מוצר באתר",
+        "type": "טקסט"
+      },
+      {
+        "name": "יומן יצירה",
+        "type": "יומן יצירה"
+      }
+    ]
+  },
+  {
+    "id": "mb-5087177211",
+    "name": "וואטסאפ 10%",
+    "category": "mb-sales",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 2,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח לניהול קבוצת הוואטסאפ להטבת 10%, המקשר את הלקוחות שמשתייכים לקבוצה. משמש לניהול ההטבה מול הלקוחות המקושרים.",
+    "groups": [
+      "קבוצת וואטסאפ"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "לקוחות",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "מזהה פריט",
+        "type": "מזהה פריט"
+      }
+    ]
+  },
+  {
+    "id": "mb-1941752787",
+    "name": "נרשמים וובינר",
+    "category": "mb-web",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 3853,
+    "kindHe": "לוח ציבורי",
+    "description": "מאגר הנרשמים לוובינרים, כולל פרטי קשר, תאריך הוובינר, מקור ההגעה וסטטוס שליחת ההודעה. מאפשר לנהל את קהל הנרשמים ולעקוב אחר יצירת הקשר איתם לפני כל וובינר.",
+    "groups": [
+      "10.09.2025",
+      "13.07.2025"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "מתי נכנס למערכת",
+        "type": "יומן יצירה"
+      },
+      {
+        "name": "טלפון",
+        "type": "טלפון"
+      },
+      {
+        "name": "אימייל",
+        "type": "אימייל"
+      },
+      {
+        "name": "סטטוס שליחת הודעה",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מזהה מאניצ׳ט",
+        "type": "טקסט"
+      },
+      {
+        "name": "תאריך הוובינר",
+        "type": "תאריך"
+      },
+      {
+        "name": "מקור הגעה",
+        "type": "סטטוס"
+      }
+    ]
+  },
+  {
+    "id": "mb-2042984183",
+    "name": "הסבר להקמת וובינר",
+    "category": "mb-web",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 2,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח עזר שמרכז הסברים וקבצים להקמת וובינר. משמש כמדריך פנימי לתהליך ההקמה.",
+    "groups": [
+      "מסמכים"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "קבצים",
+        "type": "קובץ"
+      }
+    ]
+  },
+  {
+    "id": "mb-1945106937",
+    "name": "הפקת וובינרים",
+    "category": "mb-web",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 2,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח לניהול והפקת הוובינרים, כולל הוובינר הקרוב, הוובינרים העתידיים והארכיון. שומר את מועד כל וובינר, הקישור לזום והסטטוס שלו.",
+    "groups": [
+      "וובינר הבא",
+      "וובינרים עתידיים",
+      "ארכיון וובינרים"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "פריטי משנה",
+        "type": "משימות משנה"
+      },
+      {
+        "name": "סטטוס",
+        "type": "סטטוס"
+      },
+      {
+        "name": "לינק לזום",
+        "type": "טקסט"
+      },
+      {
+        "name": "תאריך",
+        "type": "תאריך"
+      }
+    ]
+  },
+  {
+    "id": "mb-5098044923",
+    "name": "מעקב הודעות ארבוקס",
+    "category": "mb-ops",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 354,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח מעקב אחר ההודעות שנשלחו ללקוחות דרך ארבוקס, כולל מספר הטלפון שאליו נשלחה ההודעה, תוכן ההודעה, הסניף ותאריך השליחה. מאפשר לתעד את התקשורת שיצאה ללקוחות.",
+    "groups": [
+      "הודעות שנשלחו"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "מספר טלפון שאליו נשלחה ההודעה",
+        "type": "טלפון"
+      },
+      {
+        "name": "לינק לשיחה במאני צ׳אט",
+        "type": "קישור"
+      },
+      {
+        "name": "הודעה שנשלחה",
+        "type": "טקסט"
+      },
+      {
+        "name": "סניף",
+        "type": "סטטוס"
+      },
+      {
+        "name": "תאריך שליחה",
+        "type": "יומן יצירה"
+      }
+    ]
+  },
+  {
+    "id": "mb-5088015964",
+    "name": "שקילות",
+    "category": "mb-ops",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 5,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח למעקב אחר שקילות ומדידות של הלקוחות, כולל משקל, היקף מותניים והיקף ירכיים, מי ביצע את השקילה ותאריך המדידה. מקושר ללקוחות ולסדנאות למעקב אחר ההתקדמות.",
+    "groups": [
+      "שקילות"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "מבצע שקילה",
+        "type": "אחראי"
+      },
+      {
+        "name": "משקל",
+        "type": "מספר"
+      },
+      {
+        "name": "היקף מותניים",
+        "type": "טקסט"
+      },
+      {
+        "name": "היקף ירכיים",
+        "type": "טקסט"
+      },
+      {
+        "name": "סדנאות",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "תאריך שקילה",
+        "type": "יומן יצירה"
+      },
+      {
+        "name": "לקוחות",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "מזהה פריט",
+        "type": "מזהה פריט"
+      }
+    ]
+  },
+  {
+    "id": "mb-1973739934",
+    "name": "ניהול שליחת הודעות",
+    "category": "mb-ops",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 4,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח בקרה לניהול שליחת הודעות תפוצה, כולל תוכן ההודעה, תאריך השליחה האחרון, כמות ההודעות בכל שליחה והגדרות פיצול. משמש לתפעול הדיוורים אל המאגרים.",
+    "groups": [
+      "שליחת הודעות"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "פריטי משנה",
+        "type": "משימות משנה"
+      },
+      {
+        "name": "הודעת תפוצה",
+        "type": "טקסט"
+      },
+      {
+        "name": "תאריך שליחה אחרון",
+        "type": "תאריך"
+      },
+      {
+        "name": "שליחת הודעה",
+        "type": "סטטוס"
+      },
+      {
+        "name": "כמות שליחות בלחיצה",
+        "type": "טקסט"
+      },
+      {
+        "name": "פיצול",
+        "type": "סטטוס"
+      },
+      {
+        "name": "מעבר לשליחת דיוור",
+        "type": "טקסט"
+      }
+    ]
+  },
+  {
+    "id": "mb-5088016799",
+    "name": "הקפאות",
+    "category": "mb-ops",
+    "platform": "monday",
+    "status": "active",
+    "itemsCount": 1,
+    "kindHe": "לוח ציבורי",
+    "description": "לוח לניהול הקפאות מנויים של הלקוחות, כולל טווח זמן ההקפאה, כמות הימים והלקוח וההרשמה למנוי המקושרים. מאפשר לעקוב אחר תקופות ההקפאה של כל לקוחה.",
+    "groups": [
+      "הקפאות"
+    ],
+    "fields": [
+      {
+        "name": "שם",
+        "type": "שם"
+      },
+      {
+        "name": "טווח זמן הקפאה",
+        "type": "טווח תאריכים"
+      },
+      {
+        "name": "כמות ימים",
+        "type": "מספר"
+      },
+      {
+        "name": "תאריך ביצוע הקפאה",
+        "type": "יומן יצירה"
+      },
+      {
+        "name": "הרשמות למנויים",
+        "type": "קישור ללוח"
+      },
+      {
+        "name": "לקוחות",
+        "type": "קישור ללוח"
+      }
+    ]
+  }
+];
+
+const heFmt = { make:"Make.com", n8n:"n8n", monday:"monday" };
+
+function branchOf(name){
+  if(name.indexOf("נוף הגליל")>=0) return "נוף הגליל";
+  if(name.indexOf("חיפה")>=0)      return "חיפה";
+  return null;
+}
+
+function badgesHTML(a){
+  const br  = branchOf(a.name);
+  const brB = br ? `<span class="badge branch">📍 ${br}</span>` : "";
+  const p   = `<span class="badge ${a.platform}"><span class="pip"></span>${heFmt[a.platform]||a.platform}</span>`;
+  const s   = a.status==="active"
+    ? `<span class="badge active"><span class="pip"></span>פעילה</span>`
+    : `<span class="badge inactive"><span class="pip"></span>לא פעילה</span>`;
+  return brB + p + s;
+}
+
+function cardHTML(a){
+  const steps = (a.steps||[]).map(s=>`<li>${s}</li>`).join("");
+  const apps  = (a.apps&&a.apps.length)?`<div class="apps">${a.apps.map(x=>`<span class="app-chip">${x}</span>`).join("")}</div>`:"";
+  const op    = ALL_OPEN ? " open" : "";
+  return `
+    <article class="card${op}" data-id="${a.id}">
+      <button class="card-head" aria-expanded="${ALL_OPEN}">
+        <span class="chev">▾</span>
+        <div class="card-main">
+          <div class="card-title-row">
+            <h3>${a.name}</h3>
+            <div class="badges">${badgesHTML(a)}</div>
+          </div>
+          <p class="desc">${a.description||""}</p>
+          ${apps}
+        </div>
+      </button>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="meta">
+          ${a.trigger?`<div class="meta-block"><div class="k">⚡ מתי זה רץ</div><div class="v">${a.trigger}</div></div>`:""}
+          ${steps?`<div class="meta-block"><div class="k">📋 מה קורה בפועל</div><ol class="steps">${steps}</ol></div>`:""}
+        </div>
+      </div></div>
+    </article>`;
+}
+
+function boardCardHTML(b){
+  const op   = ALL_OPEN ? " open" : "";
+  const cnt  = (b.itemsCount||0).toLocaleString("he-IL");
+  const grps = (b.groups||[]).filter(Boolean);
+  const fld  = (b.fields||[]);
+  const grpBlock = grps.length
+    ? `<div class="meta-block"><div class="k">🗂️ קבוצות בלוח</div><div class="apps">${grps.map(g=>`<span class="group-pill">${g}</span>`).join("")}</div></div>` : "";
+  const fldBlock = fld.length
+    ? `<div class="meta-block"><div class="k">📋 שדות בלוח (${fld.length})</div><div class="apps">${fld.map(f=>`<span class="field-chip">${f.name}<em>${f.type||""}</em></span>`).join("")}</div></div>` : "";
+  return `
+    <article class="card${op}" data-id="${b.id}">
+      <button class="card-head" aria-expanded="${ALL_OPEN}">
+        <span class="chev">▾</span>
+        <div class="card-main">
+          <div class="card-title-row">
+            <h3>${b.name}</h3>
+            <div class="badges">
+              <span class="badge monday"><span class="pip"></span>monday</span>
+              <span class="badge count-badge">${cnt} רשומות</span>
+              ${b.kindHe?`<span class="badge kind">${b.kindHe}</span>`:""}
+            </div>
+          </div>
+          <p class="desc">${b.description||""}</p>
+        </div>
+      </button>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="meta">${grpBlock}${fldBlock}</div>
+      </div></div>
+    </article>`;
+}
+
+let MODE     = "auto";  // auto (Make+n8n) | monday (boards)
+let PLATFORM = "all";   // all | make | n8n
+let STATUS   = "all";   // all | active | inactive
+let QUERY    = "";
+let ALL_OPEN = false;
+
+function hay(a){
+  if(!a._hay){
+    a._hay = [a.name, a.description, a.trigger,
+              (a.apps||[]).join(" "), (a.steps||[]).join(" "),
+              (a.groups||[]).join(" "), (a.fields||[]).map(f=>f.name+" "+f.type).join(" ")]
+              .filter(Boolean).join(" ").toLowerCase();
+  }
+  return a._hay;
+}
+function matches(a){
+  if(MODE==="auto"){                                // platform/status only apply to automations
+    if(PLATFORM!=="all" && a.platform!==PLATFORM) return false;
+    if(STATUS!==  "all" && a.status  !==STATUS)   return false;
+  }
+  if(QUERY && hay(a).indexOf(QUERY)<0)            return false;
+  return true;
+}
+
+function render(){
+  const main = document.getElementById("main");
+  const nav  = document.getElementById("nav-links");
+  main.innerHTML = "";
+  nav.innerHTML  = "";
+
+  // Active tab only — automations and monday never render together.
+  const cats  = (MODE==="auto") ? CATEGORIES : MB_CATEGORIES;
+  const data  = (MODE==="auto") ? AUTOMATIONS : BOARDS;
+  const cardFn= (MODE==="auto") ? cardHTML : boardCardHTML;
+  const shown = data.filter(matches);
+
+  cats.forEach(cat=>{
+    const items = shown.filter(x=>x.category===cat.id);
+    if(!items.length) return; // hide categories with nothing under the current filter
+
+    nav.insertAdjacentHTML("beforeend",
+      `<a href="#sec-${cat.id}" data-sec="${cat.id}">
+         <span>${cat.icon} ${cat.title}</span>
+         <span class="count">${items.length}</span>
+       </a>`);
+
+    main.insertAdjacentHTML("beforeend",
+      `<section class="section" id="sec-${cat.id}">
+         <div class="section-head">
+           <div class="ico">${cat.icon}</div>
+           <div><h2>${cat.title} <span class="sec-count">${items.length}</span></h2><p>${cat.desc}</p></div>
+         </div>
+         ${items.map(cardFn).join("")}
+       </section>`);
+  });
+
+  if(!shown.length){
+    main.insertAdjacentHTML("beforeend",
+      `<div class="empty">לא נמצאו פריטים שמתאימים לחיפוש או לסינון.<br><strong>נסו לנקות את החיפוש.</strong></div>`);
+  }
+
+  // result count
+  const rc = document.getElementById("result-count");
+  const noun = (MODE==="auto") ? "אוטומציות" : "לוחות";
+  rc.innerHTML = (shown.length===data.length)
+    ? `<b>${data.length}</b> ${noun}`
+    : `מציג <b>${shown.length}</b> מתוך ${data.length}`;
+
+  wireScrollSpy();
+}
+
+function fillStats(){
+  // automations stat row + tab count
+  const nMake = AUTOMATIONS.filter(a=>a.platform==="make").length;
+  const nN8n  = AUTOMATIONS.filter(a=>a.platform==="n8n").length;
+  document.getElementById("s-total").textContent  = AUTOMATIONS.length;
+  document.getElementById("s-make").textContent   = nMake;
+  document.getElementById("s-n8n").textContent    = nN8n;
+  document.getElementById("s-active").textContent = AUTOMATIONS.filter(a=>a.status==="active").length;
+  document.getElementById("t-cnt-auto").textContent = AUTOMATIONS.length;
+
+  // monday stat row + tab count
+  const records = BOARDS.reduce((s,b)=>s+(b.itemsCount||0),0);
+  const fields  = BOARDS.reduce((s,b)=>s+((b.fields||[]).length),0);
+  const cats    = new Set(BOARDS.map(b=>b.category)).size;
+  document.getElementById("mb-s-boards").textContent  = BOARDS.length;
+  document.getElementById("mb-s-records").textContent = records.toLocaleString("he-IL");
+  document.getElementById("mb-s-cats").textContent    = cats;
+  document.getElementById("mb-s-fields").textContent  = fields;
+  document.getElementById("t-cnt-monday").textContent = BOARDS.length;
+
+  // platform-seg counts (automations only)
+  document.getElementById("c-all").textContent  = AUTOMATIONS.length;
+  document.getElementById("c-make").textContent = nMake;
+  document.getElementById("c-n8n").textContent  = nN8n;
+}
+
+function setMode(mode){
+  if(mode===MODE) return;
+  MODE = mode;
+  // tabs active state
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on", b.dataset.mode===mode));
+  // stats rows
+  document.getElementById("stats-auto").classList.toggle("hidden", mode!=="auto");
+  document.getElementById("stats-monday").classList.toggle("hidden", mode!=="monday");
+  // auto-only filters (platform/status) hidden in monday mode
+  document.querySelectorAll(".auto-only").forEach(el=>el.classList.toggle("hidden", mode!=="auto"));
+  // clear search when switching tabs
+  const input = document.getElementById("search");
+  input.value=""; QUERY=""; document.getElementById("search-wrap").classList.remove("has");
+  // update search placeholder
+  input.placeholder = (mode==="auto") ? "חיפוש אוטומציה לפי שם, תיאור או מערכת…" : "חיפוש לוח לפי שם, תיאור או שדה…";
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function segWire(id, apply){
+  document.querySelectorAll(`#${id} button`).forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(`#${id} button`).forEach(b=>b.classList.remove("on"));
+      btn.classList.add("on");
+      apply(btn);
+      render();
+    });
+  });
+}
+
+function wireFilter(){
+  // tabs
+  document.querySelectorAll("#tabs button").forEach(btn=>{
+    btn.addEventListener("click",()=>setMode(btn.dataset.mode));
+  });
+
+  segWire("platform-seg", b=>{ PLATFORM=b.dataset.pf; });
+  segWire("status-seg",   b=>{ STATUS  =b.dataset.st; });
+
+  // search
+  const wrap  = document.getElementById("search-wrap");
+  const input = document.getElementById("search");
+  const clear = document.getElementById("search-clear");
+  input.addEventListener("input",()=>{
+    QUERY = input.value.trim().toLowerCase();
+    wrap.classList.toggle("has", QUERY.length>0);
+    render();
+  });
+  clear.addEventListener("click",()=>{
+    input.value=""; QUERY=""; wrap.classList.remove("has"); input.focus(); render();
+  });
+
+  // expand / collapse all
+  const tgl = document.getElementById("toggle-all");
+  tgl.addEventListener("click",()=>{
+    ALL_OPEN = !ALL_OPEN;
+    document.getElementById("toggle-all-txt").textContent = ALL_OPEN ? "סגור הכל" : "פתח הכל";
+    document.getElementById("toggle-all-ico").textContent = ALL_OPEN ? "⊖" : "⊕";
+    document.querySelectorAll(".card").forEach(c=>{
+      c.classList.toggle("open", ALL_OPEN);
+      c.querySelector(".card-head")?.setAttribute("aria-expanded", ALL_OPEN);
+    });
+  });
+
+  // card expand/collapse (event delegation — survives re-renders)
+  document.getElementById("main").addEventListener("click",ev=>{
+    const head = ev.target.closest(".card-head");
+    if(!head) return;
+    const card = head.closest(".card");
+    head.setAttribute("aria-expanded", card.classList.toggle("open"));
+  });
+
+  // back to top
+  const tt = document.getElementById("to-top");
+  tt.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+  window.addEventListener("scroll",()=>{
+    tt.classList.toggle("show", window.scrollY>400);
+  },{passive:true});
+}
+
+function wireScrollSpy(){
+  const links = [...document.querySelectorAll(".nav a")];
+  const map = new Map(links.map(l=>[l.dataset.sec,l]));
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove("active"));
+        const id = e.target.id.replace("sec-","");
+        map.get(id)?.classList.add("active");
+      }
+    });
+  },{rootMargin:"-20% 0px -70% 0px",threshold:0});
+  document.querySelectorAll(".section").forEach(s=>obs.observe(s));
+
+  links.forEach(l=>l.addEventListener("click",ev=>{
+    ev.preventDefault();
+    document.querySelector(l.getAttribute("href"))
+      ?.scrollIntoView({behavior:"smooth",block:"start"});
+  }));
+}
+
+fillStats();
+wireFilter();
+render();
+</script>
+</body>
+</html>
